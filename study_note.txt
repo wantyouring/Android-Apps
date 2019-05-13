@@ -50,4 +50,14 @@ api키 받기.
 여기까지 기본설정 끝. 이제 main activity, layout파일 작성하면 끝.
 activity파일에는 유튜브 동영상id, 구글 api키가 추가로 들어감. 자세한건 코드 참고.
 
-@Tutorial7: 
+@Tutorial7: 이미지 버튼 추가하기
+오류:
+파일 추가하고 난 다음에 파일이름 바꾸면 오류생김.
+
+전체과정.
+버튼 상태별로 이미지 준비. res->drawable에 복붙.
+button.xml파일 생성 후 상태에 따른 이미지파일 설정.
+layout에서 해당 button.xml정보 불러와 사용.
+background는 기본 이미지로 지정.
+
+@Tutorial8: 
