@@ -32,6 +32,22 @@ subactivity에서 getIntent()로 intent받기. getStringExtra등의 메소드로 보낸 데이�
 AndroidManifest.xml파일에 subactivity 추가해줘야함.
 
 intent가 여러 액티비티 사이에서 데이터를 주고받을 수 있는 버스역할.
+추가로 3depth 이상으로 만드는 것은 유저가 피곤해져 삼가는 편이 좋다고 함.
 
-@Tutorial6: 
+@Tutorial6: 유튜브 api 추가하기
+오류:
+xml design에서 palette에 youtube view가 없어 xml코드 웹에서 가져옴.
 
+전체 과정.
+youtube api 다운.
+jar파일 app/libs에 넣어줌.
+project structure에서 dependencies의 app선택. +버튼 눌러 youtube jar파일 implementation으로 추가.
+manifest에 user-permission추가.
+google api console에서 새 프로젝트.
+api키 받기.
+화면 우측 gradle -> app -> Tasks -> android -> signingReport에서 SHA1키 복사.
+아까 받은 구글 api키에서 SHA1키, 패키지명 추가.(패키지명은 manifest에 있음)
+여기까지 기본설정 끝. 이제 main activity, layout파일 작성하면 끝.
+activity파일에는 유튜브 동영상id, 구글 api키가 추가로 들어감. 자세한건 코드 참고.
+
+@Tutorial7: 
