@@ -24,4 +24,14 @@ getView를 오버라이딩하고 LayoutInflater(xml파일을 view로 받아오기. MainActivity�
 
 layout xml파일을 사용자에게 보여주려면 view로 만들어야함.
 
-@Tutorial5: 
+@Tutorial5: 두 액티비티간에 정보 전달 및 액티비티 전환.
+전체 과정.
+subactivity의 class파일, xml파일 생성.
+mainactivity에서 intent생성하여 subactivity 파라미터로 지정하고 putExtra로 데이터 전송. startActivity(intent)로 subactivity띄움.
+subactivity에서 getIntent()로 intent받기. getStringExtra등의 메소드로 보낸 데이터 받아 사용하기.
+AndroidManifest.xml파일에 subactivity 추가해줘야함.
+
+intent가 여러 액티비티 사이에서 데이터를 주고받을 수 있는 버스역할.
+
+@Tutorial6: 
+
