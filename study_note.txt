@@ -60,4 +60,35 @@ button.xml파일 생성 후 상태에 따른 이미지파일 설정.
 layout에서 해당 button.xml정보 불러와 사용.
 background는 기본 이미지로 지정.
 
-@Tutorial8: 
+@Tutorial8: 이미지 슬라이더 구현
+오류:
+viewpager xml에 추가할 때 오류생김.
+---
+This operation requires the library com.android.support:support-v4:+.
+
+Problem: Inconsistencies in the existing project dependencies found.
+Version incompatibility between:
+-   com.android.support:appcompat-v7:28.0.0
+and:
+-   com.android.support:appcompat-v7:28.0.0
+
+With the dependency:
+-   com.android.support:support-annotations:26.1.0
+versus:
+-   com.android.support:support-annotations:28.0.0
+
+The project may not compile after adding this library.
+Would you like to add it anyway?
+---
+imageView.setImageResource(images[position]); //Adapter.java의 39line.에서 오류.
+java.lang.OutOfMemoryError: Failed to allocate a 573308940 byte allocation with 3915834 free bytes and 378MB until OOM => 메모리 초과 오류남.
+=> 픽셀 줄여서 이미지 저장하니 제대로 작동함. 이미지 크기가 너무 커서 오류났음.
+추가 해결책으로 manifest에 hardwareaccelerated, largeHeap설정을 해주면 해결될 때도 있다고 함.
+glide로도 문제 해결할 수 있다고 함.
+
+전체 과정.
+이미지파일들 drawable에 추가. (픽셀 너무 크면 안되니 작게 조정하여)
+activity_main.xml에 Viewpager추가.
+slider.xml에 스크롤하여 표시할 정보 추가. ex)textview, imageview
+mainactivity클래스 작성. viewpager에 adapter로 정보 전달.
+adapter 클래스파일 작성. -> inflater로 slider layout을 view로 객체화하고 한 화면을 구성함. 이때 instantiateItem을 override해 입력파라미터로 받은 position으로 해당 view 디자인 후 viewgroup에 넘겨줌.
