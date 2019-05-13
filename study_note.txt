@@ -1,0 +1,27 @@
+OnClickListener() 사용할 때 해당 interface의 리스너 생성. ex) view, dialoginterface
+
+@Tutorial3: layout 2개 추가하여 navigation bar에서 layout선택.
+- inflater는 xml로 정의된 view (또는 menu 등)를 실제 객체화 시키는 용도입니다.
+예를 들어 약간 복잡한 구조의 view를 java코드로 만들게 되면 생성하고 속성 넣어주느라 코드가 길어질 수 있는데,
+그걸 미리 xml로 만들어 놓고 java코드에서는 inflater를 활용하여 바로 view를 생성할 수 있습니다.
+
+오류수정 :
+1. content_main.xml에 id 추가해주기.
+2. import내용 수정.
+
+전체 과정.
+1. res/menu/activity_main_drawer.xml 에서 navigation bar의 id, icon, title 수정.
+2. first layout, second layout파일들 1. java폴더에 class파일 추가, 2. res/layout에 xml파일 추가.
+
+@Tutorial4: list view작성하기. 사용자 정의 listview 작성하기.
+전체 과정.
+1. string[] -> adapter -> list view.
+1+.문자열리스트 등의 items들 -> 안드로이드 제공 or 사용자 정의 adapter에 전달. -> listview에서 setAdapter로 adapter전달받고 OnItemClickListener로 클릭 시 행동 정의.
+
+- 사용자 정의 adapter 작성:
+ArrayAdapter<>를 상속받고 super(context, R.layout.image_layout, items)
+getView를 오버라이딩하고 LayoutInflater(xml파일을 view로 받아오기. MainActivity에서 setContentView와 비슷한 역할)로 view를 생성하고 text, image를 설정해 view return.
+
+layout xml파일을 사용자에게 보여주려면 view로 만들어야함.
+
+@Tutorial5: 
