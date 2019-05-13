@@ -1,3 +1,14 @@
+---목록---
+1. 계산기.
+2. 리스트 alert dialog. 버튼 alert dialog.
+3. navigation bar. layout 바꾸기.(navigation bar, inflater 사용)
+4. listview생성, 사용자 정의 listview.(listview, adapter 사용)
+5. 액티비티간 정보전달.(intent 사용)
+6. youtube api사용
+7. image button추가하기
+8. image slider 구현.(viewpager 사용)
+-----------
+
 OnClickListener() 사용할 때 해당 interface의 리스너 생성. ex) view, dialoginterface
 
 @Tutorial3: layout 2개 추가하여 navigation bar에서 layout선택.
