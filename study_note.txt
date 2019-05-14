@@ -103,3 +103,14 @@ activity_main.xml에 Viewpager추가.
 slider.xml에 스크롤하여 표시할 정보 추가. ex)textview, imageview
 mainactivity클래스 작성. viewpager에 adapter로 정보 전달.
 adapter 클래스파일 작성. -> inflater로 slider layout을 view로 객체화하고 한 화면을 구성함. 이때 instantiateItem을 override해 입력파라미터로 받은 position으로 해당 view 디자인 후 viewgroup에 넘겨줌.
+
+@Tutorial9: layout설정
+1. constraint layout 사용. (relative layout과 비슷) => 가장 외부 layout으로.
+2. table layout 사용.
+3. grid layout 사용. => android:에 없는 옵션은 app:에서 찾기.
+4. frame layout(구현은 안함) => 화면 맨 왼쪽위부터 겹쳐서 나오게끔. 화면전환 등에 사용.
+5. linear layout => horizontal, vertical설정해 수평,수직배열.
+
+
+------개인 프로젝트------
+파일 저장해 갤러리에서 보는 방법. => 해결.
