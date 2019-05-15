@@ -1,11 +1,13 @@
 package com.example.tutorial12;
 
 import android.content.Intent;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
@@ -29,11 +31,17 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent(v.getContext(),NextActivity.class);
                 String login_id = loginText.getText().toString();
                 intent.putExtra("login_id",login_id);
-                startActivity(intent);
+                startActivityForResult(intent,5); //request코드 함께 보냄
             }
         });
-
-
-
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if(requestCode == 5 && resultCode == 10) {
+            TextView logout_text = (TextView)findViewById(R.id.logoutText);
+            logout_text.setText(data.getStringExtra("logout_id")+ "님이 로그아웃 하였습니다.");
+        }
+    }
+
 }
