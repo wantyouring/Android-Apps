@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if(requestCode == 5 && resultCode == 10) {
             TextView logout_text = (TextView)findViewById(R.id.logoutText);
-            logout_text.setText(data.getStringExtra("logout_id")+ "님이 로그아웃 하였습니다.");
+            logout_text.setText(data.getStringExtra("logout_id")+ "이 로그아웃 하였습니다.");
         }
     }
 
