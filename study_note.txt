@@ -128,5 +128,7 @@ activity에서 화면 일부분만 교체.
 
 @Tutorial12-2: intent 사용. requestCode, resultCode이용해 activity간의 정보 전달.
 
+@Tutorial13: permission허가. camera intent.
+
 ------개인 프로젝트------
 파일 저장해 갤러리에서 보는 방법. => 해결.
