@@ -7,6 +7,8 @@
 6. youtube api사용
 7. image button추가하기
 8. image slider 구현.(viewpager 사용)
+9. layout 사용
+10. fragment 사용
 -----------
 
 OnClickListener() 사용할 때 해당 interface의 리스너 생성. ex) view, dialoginterface
@@ -111,6 +113,8 @@ adapter 클래스파일 작성. -> inflater로 slider layout을 view로 객체화하고 한 화면
 4. frame layout(구현은 안함) => 화면 맨 왼쪽위부터 겹쳐서 나오게끔. 화면전환 등에 사용.
 5. linear layout => horizontal, vertical설정해 수평,수직배열.
 
+@Tutorial10: fragment 사용. layout버튼 만들기. 버튼 press효과.
+activity에서 화면 일부분만 교체.
 
 ------개인 프로젝트------
 파일 저장해 갤러리에서 보는 방법. => 해결.
