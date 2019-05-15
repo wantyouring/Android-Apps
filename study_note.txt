@@ -9,7 +9,12 @@
 8. image slider 구현.(viewpager 사용)
 9. layout 사용
 10. fragment 사용
+11. toolbar 사용
+12. intent 사용
+
 -----------
+
+*** 기본 파일 commit하고 마지막에 commit다시 해 변경사항 확인하기! ***
 
 OnClickListener() 사용할 때 해당 interface의 리스너 생성. ex) view, dialoginterface
 
@@ -115,6 +120,12 @@ adapter 클래스파일 작성. -> inflater로 slider layout을 view로 객체화하고 한 화면
 
 @Tutorial10: fragment 사용. layout버튼 만들기. 버튼 press효과.
 activity에서 화면 일부분만 교체.
+
+@Tutorial11: toolbar 사용.
+여기부터 github변경사항에서 수정내용 확인가능.
+
+----여기부터 학습ㄱㄱ@@@@@@@@@@@@@@
+@Tutorial12: intent 사용. 액티비티간 정보 전달.
 
 ------개인 프로젝트------
 파일 저장해 갤러리에서 보는 방법. => 해결.
