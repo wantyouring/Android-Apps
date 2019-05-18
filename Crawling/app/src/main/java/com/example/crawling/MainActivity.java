@@ -56,32 +56,36 @@ public class MainActivity extends AppCompatActivity {
             try {
 
                 Document doc = Jsoup.connect(htmlPageUrl).get();
-
-
+                Elements titles;
+/*
                 //테스트1
-                Elements titles= doc.select("div.news-con h1.tit-news");
+                titles= doc.select("div.news-con h1.tit-news");
+                System.out.println("titles 첫째 select" + titles.text());
 
                 System.out.println("-------------------------------------------------------------");
                 for(Element e: titles){
-                    System.out.println("title: " + e.text());
+                    System.out.println("title1: " + e.text());
                     htmlContentInStringFormat += e.text().trim() + "\n";
                 }
 
                 //테스트2
                 titles= doc.select("div.news-con h2.tit-news");
+                System.out.println("titles 둘째 select" + titles.text());
 
                 System.out.println("-------------------------------------------------------------");
                 for(Element e: titles){
-                    System.out.println("title: " + e.text());
+                    System.out.println("title2: " + e.text());
                     htmlContentInStringFormat += e.text().trim() + "\n";
-                }
+                }*/
 
                 //테스트3
-                titles= doc.select("li.section02 div.con h2.news-tl");
+                //titles= doc.select("li.section02 div.con h2.news-tl");
+                titles= doc.select("li.section02 div.con ul.h-related li");
+                System.out.println("titles 셋째 select" + titles.text());
 
                 System.out.println("-------------------------------------------------------------");
                 for(Element e: titles){
-                    System.out.println("title: " + e.text());
+                    System.out.println("title3: " + e.text());
                     htmlContentInStringFormat += e.text().trim() + "\n";
                 }
                 System.out.println("-------------------------------------------------------------");
