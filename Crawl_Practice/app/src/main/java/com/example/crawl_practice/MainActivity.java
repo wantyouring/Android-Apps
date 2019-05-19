@@ -1,10 +1,13 @@
 package com.example.crawl_practice;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import org.jsoup.Connection;
@@ -20,32 +23,33 @@ public class MainActivity extends AppCompatActivity {
 
     PageAdapter adapter;
     ViewPager viewPager;
+    TextView forTest;
+    public static Context context;  //adapter dialog에서 context 참조하기 위해서.
 
     private String htmlPageUrl = "https://news.naver.com/main/ranking/popularDay.nhn"; //파싱할 홈페이지의 URL주소
-    TextView forTest;
+
     Document doc;
 
     ArrayList<String> items = new ArrayList<String>();
     ArrayList<String> links = new ArrayList<String>();
-
-    SharedPreferences pref = null; //pref에 현재까지 최신 공지 값 저장할 것임.
-    SharedPreferences.Editor editor = null;// editor에 put 하기
+//for data save
+//    SharedPreferences pref = null; //pref에 현재까지 최신 공지 값 저장할 것임.
+//    SharedPreferences.Editor editor = null;// editor에 put 하기
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        context = this;
 
         forTest = (TextView)findViewById(R.id.forTest);
 
         //생성 동시에 파싱해 뉴스 데이터 가져오기.
         JsoupAsyncTask jsoupAsyncTask = new JsoupAsyncTask();
         jsoupAsyncTask.execute();
-
-
-
-        pref = getSharedPreferences("pref", MODE_PRIVATE);
-        editor = pref.edit();
+        //for data save
+//        pref = getSharedPreferences("pref", MODE_PRIVATE);
+//        editor = pref.edit();
     }
 
     private class JsoupAsyncTask extends AsyncTask<Void, Void, Void> {
@@ -65,7 +69,6 @@ public class MainActivity extends AppCompatActivity {
                         .timeout(5000)
                         .followRedirects(true).execute();
                 doc = response.parse();
-                System.out.println("테스트");
                 //System.out.println(doc.toString());
                 //파싱해와 해당 분야의(정치,경제..) 제목 하나씩 items에 append하자. 분야 카테고리 100,101,...체크하기.
 
@@ -82,7 +85,6 @@ public class MainActivity extends AppCompatActivity {
                 for (Element e:links_ele) {
                     links.add("https://news.naver.com" + e.attr("href"));
                 }
-                System.out.println("크기: "+ items.size());
             } catch (IOException e) {
                 e.printStackTrace();
             }
