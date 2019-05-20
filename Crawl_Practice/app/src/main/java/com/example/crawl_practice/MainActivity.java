@@ -75,10 +75,7 @@ public class MainActivity extends AppCompatActivity {
 //                Elements titles = doc.select("table.container tbody tr td.content div.content div.ranking_section dt [title]"); //(메인부분)많이 본 뉴스 부분 파싱
                 Elements titles = doc.select("table.container tbody tr td.aside div.aside div.section.section_wide ul.section_list_ranking a[title]"); //(사이드부분)가장 많이 본 뉴스 부분 파싱
                 Elements links_ele = doc.select("table.container tbody tr td.aside div.aside div.section.section_wide ul.section_list_ranking a[href]"); //링크부분 파싱
-                //htmlContentInStringFormat += google.toString() + '\n'; // Elements 구성 확인 가능.
-                //for (Element e:google) { // text부분만 추출.
-                //    htmlContentInStringFormat += e.text()+ "\n";
-                //}
+
                 for (Element e:titles) {
                     items.add(e.text());
                 }
