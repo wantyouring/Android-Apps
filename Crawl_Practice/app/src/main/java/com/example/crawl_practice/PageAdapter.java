@@ -217,7 +217,8 @@ public class PageAdapter extends PagerAdapter {
                 //댓글 내용
                 ArrayList<String> comments = new ArrayList<String>();
                 for(int i=1;i<split.length;i++) {
-                    comments.add(split[i].split("\",\"userIdNo\"")[0]);
+                    //댓글 부분 가져오고 \n문자 공백으로 바꿔주기
+                    comments.add(split[i].split("\",\"userIdNo\"")[0].replace("\\n"," "));
                 }
                 //공감 갯수
                 ArrayList<Integer> sympathyCount = new ArrayList<>();
@@ -227,7 +228,6 @@ public class PageAdapter extends PagerAdapter {
                         sympathyCount.add(0);
                     else
                         sympathyCount.add(Integer.parseInt(str));
-                    //sympathyCount.add(Integer.parseInt(sympathy[i].split(",\"antipathyCount\"")[0]));
                 }
                 //비공감 갯수
                 ArrayList<Integer> antipathyCount = new ArrayList<>();
@@ -237,15 +237,11 @@ public class PageAdapter extends PagerAdapter {
                         antipathyCount.add(0);
                     else
                         antipathyCount.add(Integer.parseInt(str));
-//                    antipathyCount.add(Integer.parseInt(antipathy[i].split(",\"userBlind\"")[0]));
                 }
-
-//                System.out.println("댓글출력"+split.length);
 
                 int i=0;
                 for(String e:comments) {
                     commentsTextString +=(i+1)+" : "+ e + "\n"+"   공감 : "+sympathyCount.get(i)+" 비공감 : "+antipathyCount.get(i)+"\n\n";
-//                    System.out.println(e + "   공감 : "+sympathyCount.get(i)+" 비공감 : "+antipathyCount.get(i));
                     i++;
                 }
 
