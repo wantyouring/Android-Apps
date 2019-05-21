@@ -24,6 +24,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.w3c.dom.Text;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -36,18 +37,20 @@ public class PageAdapter extends PagerAdapter {
     String links[] = new String[60];
     int characters[] = new int[5];
     TextView forTest;
+    TextView comments;
     String link_uri;
     String articleId;
 
     //생성자
     public PageAdapter(Context context, ArrayList<String> items,  ArrayList<String> links,
-                       TextView forTest) {
+                       TextView forTest, TextView comments) {
         this.context = context;
         for(int i=0;i<60;i++) {
             this.items[i] = items.get(i);
             this.links[i] = links.get(i);
         }
         this.forTest = forTest;
+        this.comments = comments;
     }
 
     //PageAdapter implements
@@ -115,7 +118,7 @@ public class PageAdapter extends PagerAdapter {
                 link_uri = picked_link[position]; //링크uri 저장.
                 //forTest.setText(link_uri);
                 //  내용(or 댓글) 가져오기.
-                JsoupAsyncTask jsoupAsyncTask = new JsoupAsyncTask(link_uri,articleId,forTest);
+                JsoupAsyncTask jsoupAsyncTask = new JsoupAsyncTask(link_uri,articleId,forTest,comments);
                 jsoupAsyncTask.execute();
             }
         });
@@ -133,14 +136,17 @@ public class PageAdapter extends PagerAdapter {
     private class JsoupAsyncTask extends AsyncTask<Void, Void, Void> {
         String link_uri;
         String articleId;
+        String commentsTextString = "";
         TextView forTest;
+        TextView commentsText;
 
         //constructor
-        public JsoupAsyncTask(String link_uri, String articleId, TextView forTest) {
+        public JsoupAsyncTask(String link_uri, String articleId, TextView forTest, TextView commentsText) {
             super();
             this.link_uri = link_uri;
             this.articleId = articleId;
             this.forTest = forTest;
+            this.commentsText = commentsText;
         }
 
         @Override
@@ -170,6 +176,7 @@ public class PageAdapter extends PagerAdapter {
                         .ignoreContentType(true)
                         .get();
                 String doc_str = doc2.toString();
+                //System.out.println(doc2.toString());
                 //성향count부분 파싱
                 int angry_cnt = 0;
                 int sad_cnt = 0;
@@ -203,14 +210,43 @@ public class PageAdapter extends PagerAdapter {
                         .ignoreContentType(true)
                         .get();
                 System.out.println(articleId+"\n"+doc3.toString());
-                String split[] = doc3.toString().split("\"contents\":\"");
+                String split[] = doc3.toString().split("\"contents\":\""); //댓글 내용 파싱
+                String sympathy[] = doc3.toString().split("\"sympathyCount\":"); //공감 갯수 파악
+                String antipathy[] = doc3.toString().split("\"antipathyCount\":"); //비공감 갯수 파악
+
+                //댓글 내용
                 ArrayList<String> comments = new ArrayList<String>();
                 for(int i=1;i<split.length;i++) {
                     comments.add(split[i].split("\",\"userIdNo\"")[0]);
                 }
-                System.out.println("댓글출력"+split.length);
+                //공감 갯수
+                ArrayList<Integer> sympathyCount = new ArrayList<>();
+                for(int i=1;i<split.length;i++) {
+                    String str = sympathy[i].split(",\"antipathyCount\"")[0];
+                    if(str.equals(""))
+                        sympathyCount.add(0);
+                    else
+                        sympathyCount.add(Integer.parseInt(str));
+                    //sympathyCount.add(Integer.parseInt(sympathy[i].split(",\"antipathyCount\"")[0]));
+                }
+                //비공감 갯수
+                ArrayList<Integer> antipathyCount = new ArrayList<>();
+                for(int i=1;i<split.length;i++) {
+                    String str = antipathy[i].split(",\"userBlind\"")[0];
+                    if(str.equals(""))
+                        antipathyCount.add(0);
+                    else
+                        antipathyCount.add(Integer.parseInt(str));
+//                    antipathyCount.add(Integer.parseInt(antipathy[i].split(",\"userBlind\"")[0]));
+                }
+
+//                System.out.println("댓글출력"+split.length);
+
+                int i=0;
                 for(String e:comments) {
-                    System.out.println(e);
+                    commentsTextString +=(i+1)+" : "+ e + "\n"+"   공감 : "+sympathyCount.get(i)+" 비공감 : "+antipathyCount.get(i)+"\n\n";
+//                    System.out.println(e + "   공감 : "+sympathyCount.get(i)+" 비공감 : "+antipathyCount.get(i));
+                    i++;
                 }
 
             } catch (IOException e) {
@@ -222,6 +258,7 @@ public class PageAdapter extends PagerAdapter {
         @Override
         protected void onPostExecute(Void result) {
             String message = "";
+
             //최댓값 찾아 기사 성향 파악.
             int max = 0;
             for(int i=0;i<5;i++){
@@ -230,18 +267,19 @@ public class PageAdapter extends PagerAdapter {
             }
 
             if (max == characters[0]) {
-                message = "화가나는 기사에요 ٩(◦`꒳´◦)۶";
+                message = "화낸 기사에요!";
             } else if(max == characters[1]) {
-                message = "슬픈 기사에요 ಥ_ಥ";
+                message = "슬픈 기사에요ㅠㅠ";
             } else if(max == characters[2]) {
                 message = "후속기사를 원해요!";
             } else if(max == characters[3]) {
-                message = "따뜻한 기사에요";
+                message = "훈훈한 기사에요~";
             } else if(max == characters[4]) {
-                message = "좋은 기사에요";
+                message = "좋아한 기사에요!";
             }
 
             forTest.setText(message);
+            commentsText.setText(commentsTextString);
         }
     }
 }

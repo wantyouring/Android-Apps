@@ -6,6 +6,7 @@ import android.os.AsyncTask;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.method.ScrollingMovementMethod;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -24,6 +25,7 @@ public class MainActivity extends AppCompatActivity {
     PageAdapter adapter;
     ViewPager viewPager;
     TextView forTest;
+    TextView comments;
     public static Context context;  //adapter dialog에서 context 참조하기 위해서.
 
     private String htmlPageUrl = "https://news.naver.com/main/ranking/popularDay.nhn"; //파싱할 홈페이지의 URL주소
@@ -43,6 +45,8 @@ public class MainActivity extends AppCompatActivity {
         context = this;
 
         forTest = (TextView)findViewById(R.id.forTest);
+        comments = (TextView)findViewById(R.id.comments);
+        comments.setMovementMethod(new ScrollingMovementMethod());
 
         //생성 동시에 파싱해 뉴스 데이터 가져오기.
         JsoupAsyncTask jsoupAsyncTask = new JsoupAsyncTask();
@@ -91,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Void result) {
             viewPager = (ViewPager)findViewById(R.id.viewPager);
-            adapter = new PageAdapter(getApplicationContext(),items,links,forTest); //인자로 전달할 items추가
+            adapter = new PageAdapter(getApplicationContext(),items,links,forTest,comments); //인자로 전달할 items추가
             viewPager.setAdapter(adapter);
         }
     }
