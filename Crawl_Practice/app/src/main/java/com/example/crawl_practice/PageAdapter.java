@@ -19,16 +19,11 @@ import android.widget.Toast;
 
 import android.os.AsyncTask;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -139,7 +134,6 @@ public class PageAdapter extends PagerAdapter {
         String link_uri;
         String articleId;
         TextView forTest;
-        JsonParser jsonParser = new JsonParser();
 
         //constructor
         public JsoupAsyncTask(String link_uri, String articleId, TextView forTest) {
@@ -164,14 +158,10 @@ public class PageAdapter extends PagerAdapter {
                         .timeout(5000)
                         .followRedirects(true).execute();
                 Document doc = response.parse();
+                //System.out.println(doc.toString());
 
-                //기사 고유번호 파싱.
+                //기사 고유번호 파싱. articleId = ne_xxx_xxxxxxxxxx
                 articleId = doc.select("div._reactionModule.u_likeit").first().attr("data-cid");
-                Elements characters_cnt = doc.select("tbody tr td.content div.content ul.u_likeit_layer._faceLayer span.u_likeit_list_count._count");
-                int i=0;
-                for (Element e:characters_cnt) {
-                    characters[i] = Integer.parseInt(e.text());
-                }
 
                 //기사 고유번호로 쿼리보내 기사성향파악.
                 Document doc2 = Jsoup.connect("https://news.like.naver.com/v1/search/contents?q=NEWS["+articleId+"]|NEWS_SUMMARY["+articleId+"]")
@@ -201,6 +191,27 @@ public class PageAdapter extends PagerAdapter {
                 characters[2] = want_cnt;
                 characters[3] = warm_cnt;
                 characters[4] = like_cnt;
+
+                //해당 기사 댓글 파싱. => referrer naver로 줘야 요청성공함.
+                String articleId1 = articleId.split("_")[1];
+                String articleId2 = articleId.split("_")[2];
+                //Document doc3 = Jsoup.connect("https://apis.naver.com/commentBox/cbox/web_neo_list_jsonp.json?ticket=news&templateId=view_it&pool=cbox5&_callback=jQuery11240772130748100907_1558414665290&lang=ko&country=KR&objectId=news016%2C0001536858&categoryId=&pageSize=20&indexSize=10&groupId=&listType=OBJECT&pageType=more&parentCommentNo=1713860462&page=1&userType=&includeAllStatus=true")
+                        Document doc3 = Jsoup.connect("https://apis.naver.com/commentBox/cbox/web_neo_list_jsonp.json?ticket=news&templateId=default_society&pool=cbox5&_callback=jQuery1707138182064460843_1523512042464&lang=ko&country=&objectId=news"+articleId1+","+articleId2+"&categoryId=&pageSize=20&indexSize=10&groupId=&listType=OBJECT&pageType=more&page=1&refresh=false&sort=FAVORITE")
+                        //Document doc3 = Jsoup.connect("https://apis.naver.com/commentBox/cbox/web_neo_list_jsonp.json?ticket=news&templateId=default_it&pool=cbox5&_callback=jQuery1124028231177890026493_1558420491431&lang=ko&country=KR&objectId=news"+articleId+"&categoryId=&pageSize=20&indexSize=10&groupId=&listType=OBJECT&pageType=more&page=1&initialize=true&userType=&useAltSort=true&replyPageSize=20&moveTo=&sort=favorite&includeAllStatus=true&_=1558420491432")
+                        .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.131 Safari/537.36")
+                        .referrer("https://news.like.naver.com/")
+                        .ignoreContentType(true)
+                        .get();
+                System.out.println(articleId+"\n"+doc3.toString());
+                String split[] = doc3.toString().split("\"contents\":\"");
+                ArrayList<String> comments = new ArrayList<String>();
+                for(int i=1;i<split.length;i++) {
+                    comments.add(split[i].split("\",\"userIdNo\"")[0]);
+                }
+                System.out.println("댓글출력"+split.length);
+                for(String e:comments) {
+                    System.out.println(e);
+                }
 
             } catch (IOException e) {
                 e.printStackTrace();
