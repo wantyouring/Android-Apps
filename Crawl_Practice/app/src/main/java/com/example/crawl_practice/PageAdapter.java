@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
@@ -38,12 +39,14 @@ public class PageAdapter extends PagerAdapter {
     int characters[] = new int[5];
     TextView forTest;
     TextView comments;
+    ImageView emoticon;
+
     String link_uri;
     String articleId;
 
     //생성자
-    public PageAdapter(Context context, ArrayList<String> items,  ArrayList<String> links,
-                       TextView forTest, TextView comments) {
+    public PageAdapter(Context context, ArrayList<String> items, ArrayList<String> links,
+                       TextView forTest, TextView comments, ImageView emoticon) {
         this.context = context;
         for(int i=0;i<60;i++) {
             this.items[i] = items.get(i);
@@ -51,6 +54,7 @@ public class PageAdapter extends PagerAdapter {
         }
         this.forTest = forTest;
         this.comments = comments;
+        this.emoticon = emoticon;
     }
 
     //PageAdapter implements
@@ -93,8 +97,7 @@ public class PageAdapter extends PagerAdapter {
                         .setCancelable(false)
                         .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                             @Override
-                            public void onClick(DialogInterface dialog, int which) { //종료
-                                forTest.setText(link_uri);
+                            public void onClick(DialogInterface dialog, int which) { //기사로 이동
                                 //링크 열기
                                 Intent i = new Intent(Intent.ACTION_VIEW,Uri.parse(link_uri));
                                 MainActivity.context.startActivity(i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)); //adapter에서 activity실행하려면 addFlags해줘야함.
@@ -102,7 +105,7 @@ public class PageAdapter extends PagerAdapter {
                         })
                         .setNegativeButton("No", new DialogInterface.OnClickListener() {
                             @Override
-                            public void onClick(DialogInterface dialog, int which) { //종료 안할거임
+                            public void onClick(DialogInterface dialog, int which) { //기사로 이동x
                                 dialog.cancel();
                             }
                         });
@@ -118,7 +121,7 @@ public class PageAdapter extends PagerAdapter {
                 link_uri = picked_link[position]; //링크uri 저장.
                 //forTest.setText(link_uri);
                 //  내용(or 댓글) 가져오기.
-                JsoupAsyncTask jsoupAsyncTask = new JsoupAsyncTask(link_uri,articleId,forTest,comments);
+                JsoupAsyncTask jsoupAsyncTask = new JsoupAsyncTask(link_uri,articleId,forTest,comments,emoticon);
                 jsoupAsyncTask.execute();
             }
         });
@@ -139,14 +142,17 @@ public class PageAdapter extends PagerAdapter {
         String commentsTextString = "";
         TextView forTest;
         TextView commentsText;
+        ImageView emoticon;
 
         //constructor
-        public JsoupAsyncTask(String link_uri, String articleId, TextView forTest, TextView commentsText) {
+        public JsoupAsyncTask(String link_uri, String articleId,
+                              TextView forTest, TextView commentsText,ImageView emoticon) {
             super();
             this.link_uri = link_uri;
             this.articleId = articleId;
             this.forTest = forTest;
             this.commentsText = commentsText;
+            this.emoticon = emoticon;
         }
 
         @Override
@@ -209,7 +215,7 @@ public class PageAdapter extends PagerAdapter {
                         .referrer("https://news.like.naver.com/")
                         .ignoreContentType(true)
                         .get();
-                System.out.println(articleId+"\n"+doc3.toString());
+                //System.out.println(articleId+"\n"+doc3.toString());
                 String split[] = doc3.toString().split("\"contents\":\""); //댓글 내용 파싱
                 String sympathy[] = doc3.toString().split("\"sympathyCount\":"); //공감 갯수 파악
                 String antipathy[] = doc3.toString().split("\"antipathyCount\":"); //비공감 갯수 파악
@@ -217,8 +223,9 @@ public class PageAdapter extends PagerAdapter {
                 //댓글 내용
                 ArrayList<String> comments = new ArrayList<String>();
                 for(int i=1;i<split.length;i++) {
-                    //댓글 부분 가져오고 \n문자 공백으로 바꿔주기
-                    comments.add(split[i].split("\",\"userIdNo\"")[0].replace("\\n"," "));
+                    //댓글 부분 가져오고 \n문자 공백으로 바꿔주기, \문자 없애주기
+                    comments.add(split[i].split("\",\"userIdNo\"")[0]
+                            .replace("\\n"," ").replace("\\",""));
                 }
                 //공감 갯수
                 ArrayList<Integer> sympathyCount = new ArrayList<>();
@@ -263,18 +270,24 @@ public class PageAdapter extends PagerAdapter {
             }
 
             if (max == characters[0]) {
-                message = "화낸 기사에요!";
+                message = "많은 사람이 화낸 기사에요!";
+                emoticon.setImageResource(R.drawable.angry);
             } else if(max == characters[1]) {
-                message = "슬픈 기사에요ㅠㅠ";
+                message = "많은 사람이 슬퍼한 기사에요ㅠㅠ";
+                emoticon.setImageResource(R.drawable.sad);
             } else if(max == characters[2]) {
-                message = "후속기사를 원해요!";
+                message = "많은 사람이 후속기사를 원해요!";
+                emoticon.setImageResource(R.drawable.want);
             } else if(max == characters[3]) {
                 message = "훈훈한 기사에요~";
+                emoticon.setImageResource(R.drawable.warm);
             } else if(max == characters[4]) {
-                message = "좋아한 기사에요!";
+                message = "많은 사람이 좋아한 기사에요!";
+                emoticon.setImageResource(R.drawable.like);
             }
 
             forTest.setText(message);
+            commentsText.scrollTo(0,0); //scroll맨 위로 올리기
             commentsText.setText(commentsTextString);
         }
     }
