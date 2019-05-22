@@ -5,13 +5,12 @@ import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.text.method.ScrollingMovementMethod;
-import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.support.v7.widget.Toolbar;
 
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
@@ -31,6 +30,8 @@ public class MainActivity extends AppCompatActivity {
     TextView forTest;
     TextView comments;
     ImageView emoticon;
+    Toolbar myToolbar;
+    TextView part;
 
     Document doc;
 
@@ -50,8 +51,12 @@ public class MainActivity extends AppCompatActivity {
         comments = (TextView)findViewById(R.id.comments);
         comments.setMovementMethod(new ScrollingMovementMethod());
         emoticon = (ImageView)findViewById(R.id.emoticon);
+        myToolbar = (Toolbar)findViewById(R.id.toolbar);
+        part = (TextView)findViewById(R.id.part);
 
         forTest.setTypeface(forTest.getTypeface(), Typeface.BOLD);
+        setSupportActionBar(myToolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         //생성 동시에 파싱해 뉴스 데이터 가져오기.
         JsoupAsyncTask jsoupAsyncTask = new JsoupAsyncTask();
@@ -100,6 +105,44 @@ public class MainActivity extends AppCompatActivity {
             viewPager = (ViewPager)findViewById(R.id.viewPager);
             adapter = new PageAdapter(getApplicationContext(),items,links,forTest,comments,emoticon);
             viewPager.setAdapter(adapter);
+
+            //viewPager 바꼈을때
+            viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+                @Override
+                public void onPageScrolled(int i, float v, int i1) {
+
+                }
+
+                @Override
+                public void onPageSelected(int i) {
+                    //toolbar 메뉴 setting
+                    switch (i) {
+                        case 0:
+                            part.setText("정치");
+                            break;
+                        case 1:
+                            part.setText("경제");
+                            break;
+                        case 2:
+                            part.setText("사회");
+                            break;
+                        case 3:
+                            part.setText("생활/문화");
+                            break;
+                        case 4:
+                            part.setText("세계");
+                            break;
+                        case 5:
+                            part.setText("IT/과학");
+                            break;
+                    }
+                }
+
+                @Override
+                public void onPageScrollStateChanged(int i) {
+
+                }
+            });
         }
     }
 }

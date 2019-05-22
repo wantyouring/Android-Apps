@@ -17,7 +17,7 @@
         app:layout_constraintBottom_toTopOf="@+id/forTest"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/toolbar" />
 
     <TextView
         android:id="@+id/comments"
@@ -64,4 +64,33 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/viewPager"
         app:srcCompat="@drawable/like" />
+<!-- toolbar -->
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        android:theme="?attr/actionBarTheme"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" >
+
+        <TextView
+            android:id="@+id/part"
+            android:layout_gravity="left"
+            android:textColor="@android:color/white"
+            android:text="분야"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <ImageButton
+            android:foreground="?attr/selectableItemBackground"
+            android:id="@+id/toolbarInfo"
+            android:layout_marginRight="15dp"
+            android:layout_gravity="right"
+            android:background="@android:drawable/ic_dialog_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+    </android.support.v7.widget.Toolbar>
 </android.support.constraint.ConstraintLayout>
