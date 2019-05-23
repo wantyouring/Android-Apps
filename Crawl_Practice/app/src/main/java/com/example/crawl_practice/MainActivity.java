@@ -1,6 +1,8 @@
 package com.example.crawl_practice;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
@@ -14,6 +16,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.support.v7.widget.Toolbar;
 import android.widget.Toast;
+
+import com.tbuonomo.viewpagerdotsindicator.SpringDotsIndicator;
 
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
@@ -36,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
     Toolbar myToolbar;
     TextView part;
     ImageButton toolbarInfo;
+    SpringDotsIndicator springDotsIndicator;
 
     Document doc;
 
@@ -59,6 +64,7 @@ public class MainActivity extends AppCompatActivity {
         myToolbar = (Toolbar)findViewById(R.id.toolbar);
         part = (TextView)findViewById(R.id.part);
         toolbarInfo = (ImageButton)findViewById(R.id.toolbarInfo);
+        springDotsIndicator = (SpringDotsIndicator)findViewById(R.id.spring_dots_indicator);
 
         forTest.setTypeface(forTest.getTypeface(), Typeface.BOLD);
         setSupportActionBar(myToolbar);
@@ -67,7 +73,16 @@ public class MainActivity extends AppCompatActivity {
         toolbarInfo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) { //@@@dialog로 바꾸기
-                Toast.makeText(MainActivity.this, "기사클릭 : 기사 성향, 댓글 확인\n기사롱클릭 : 해당 기사로 이동\n좌우스크롤 : 분야 이동", Toast.LENGTH_LONG).show();
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.context);
+                builder.setMessage("기사클릭 : 기사 성향, 댓글 확인\n기사롱클릭 : 해당 기사로 이동\n좌우스크롤 : 분야 이동")
+                        .setTitle("사용법")
+                        .setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.cancel();}
+                        });
+                AlertDialog alertDialog = builder.create();
+                alertDialog.show();
             }
         });
 
@@ -146,6 +161,7 @@ public class MainActivity extends AppCompatActivity {
             viewPager = (ViewPager)findViewById(R.id.viewPager);
             adapter = new PageAdapter(getApplicationContext(),items,links,imagelinks,forTest,comments,emoticon);
             viewPager.setAdapter(adapter);
+            springDotsIndicator.setViewPager(viewPager);
 
             //viewPager 바꼈을때
             viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
