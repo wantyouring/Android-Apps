@@ -23,9 +23,6 @@ import android.os.AsyncTask;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
-import org.w3c.dom.Text;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -121,7 +118,6 @@ public class PageAdapter extends PagerAdapter {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 link_uri = picked_link[position]; //링크uri 저장.
-                //forTest.setText(link_uri);
                 //  내용(or 댓글) 가져오기.
                 JsoupAsyncTask jsoupAsyncTask = new JsoupAsyncTask(link_uri,articleId,forTest,comments,emoticon);
                 jsoupAsyncTask.execute();
