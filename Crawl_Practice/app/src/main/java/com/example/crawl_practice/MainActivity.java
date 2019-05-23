@@ -8,9 +8,12 @@ import android.support.v4.view.ViewPager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.method.ScrollingMovementMethod;
+import android.view.View;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.support.v7.widget.Toolbar;
+import android.widget.Toast;
 
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
@@ -32,11 +35,13 @@ public class MainActivity extends AppCompatActivity {
     ImageView emoticon;
     Toolbar myToolbar;
     TextView part;
+    ImageButton toolbarInfo;
 
     Document doc;
 
     ArrayList<String> items = new ArrayList<String>();
     ArrayList<String> links = new ArrayList<String>();
+    String imagelinks[] = new String[60];
 //for data save
 //    SharedPreferences pref = null; //pref에 현재까지 최신 공지 값 저장할 것임.
 //    SharedPreferences.Editor editor = null;// editor에 put 하기
@@ -53,10 +58,18 @@ public class MainActivity extends AppCompatActivity {
         emoticon = (ImageView)findViewById(R.id.emoticon);
         myToolbar = (Toolbar)findViewById(R.id.toolbar);
         part = (TextView)findViewById(R.id.part);
+        toolbarInfo = (ImageButton)findViewById(R.id.toolbarInfo);
 
         forTest.setTypeface(forTest.getTypeface(), Typeface.BOLD);
         setSupportActionBar(myToolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
+
+        toolbarInfo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) { //@@@dialog로 바꾸기
+                Toast.makeText(MainActivity.this, "기사클릭 : 기사 성향, 댓글 확인\n기사롱클릭 : 해당 기사로 이동\n좌우스크롤 : 분야 이동", Toast.LENGTH_LONG).show();
+            }
+        });
 
         //생성 동시에 파싱해 뉴스 데이터 가져오기.
         JsoupAsyncTask jsoupAsyncTask = new JsoupAsyncTask();
@@ -76,13 +89,13 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected Void doInBackground(Void... params) {
             try {
+                //주소, 링크 파싱
                 Connection.Response response = Jsoup.connect("https://news.naver.com/main/ranking/popularDay.nhn").ignoreContentType(true)
                         .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.131 Safari/537.36")
                         .referrer("http://www.google.com")
                         .timeout(5000)
                         .followRedirects(true).execute();
                 doc = response.parse();
-                //파싱해와 해당 분야의(정치,경제..) 제목 하나씩 items에 append하자. 분야 카테고리 100,101,...체크하기.
 
 //                Elements titles = doc.select("table.container tbody tr td.content div.content div.ranking_section dt [title]"); //(메인부분)많이 본 뉴스 부분 파싱
                 Elements titles = doc.select("table.container tbody tr td.aside div.aside div.section.section_wide ul.section_list_ranking a[title]"); //(사이드부분)가장 많이 본 뉴스 부분 파싱
@@ -94,6 +107,34 @@ public class MainActivity extends AppCompatActivity {
                 for (Element e:links_ele) {
                     links.add("https://news.naver.com" + e.attr("href"));
                 }
+
+                //미리보기 이미지 주소 파싱
+                //100:정치, 101:경제, 102:사회, 103:생활/문화, 104: 세계, 105:IT/과학
+                String part_string;
+                for(int i=0;i<6;i++) {
+                    part_string = "https://news.naver.com/main/ranking/popularDay.nhn?rankingType=popular_day&sectionId=" + (100 + i);
+                    response = Jsoup.connect(part_string).ignoreContentType(true)
+                            .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.131 Safari/537.36")
+                            .referrer("http://www.google.com")
+                            .timeout(5000)
+                            .followRedirects(true).execute();
+                    doc = response.parse();
+
+                    links_ele = doc.select("table.container tbody tr td.content ol.ranking_list img");
+                    Elements thumb_check = doc.select("table.container tbody tr td.content ol.ranking_list div.ranking_thumb a");
+                    ArrayList<Integer> thumbIndex = new ArrayList<Integer>();
+                    for(int j=0;;j++) {
+                        int tmp;
+                        tmp = Integer.parseInt(thumb_check.get(j).attr("href").split("rankingSeq=")[1].split("\"")[0]);
+                        thumbIndex.add(tmp-1); //thumb counting은 1부터 시작함
+                        if (tmp >= 10)
+                            break;
+                    }
+                    int j=0;
+                    for(Integer index: thumbIndex)   //이미지링크 rank10까지만 추출
+                        imagelinks[i*10+index] = links_ele.get(j++).attr("src");
+                }
+
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -103,7 +144,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Void result) {
             viewPager = (ViewPager)findViewById(R.id.viewPager);
-            adapter = new PageAdapter(getApplicationContext(),items,links,forTest,comments,emoticon);
+            adapter = new PageAdapter(getApplicationContext(),items,links,imagelinks,forTest,comments,emoticon);
             viewPager.setAdapter(adapter);
 
             //viewPager 바꼈을때

@@ -36,6 +36,7 @@ public class PageAdapter extends PagerAdapter {
     final Context context;
     String items[] = new String[60];
     String links[] = new String[60];
+    String imageLinks[] = new String[60];
     int characters[] = new int[5];
     TextView forTest;
     TextView comments;
@@ -46,11 +47,12 @@ public class PageAdapter extends PagerAdapter {
 
     //생성자
     public PageAdapter(Context context, ArrayList<String> items, ArrayList<String> links,
-                       TextView forTest, TextView comments, ImageView emoticon) {
+                       String imageLinks[],TextView forTest, TextView comments, ImageView emoticon) {
         this.context = context;
         for(int i=0;i<60;i++) {
             this.items[i] = items.get(i);
             this.links[i] = links.get(i);
+            this.imageLinks[i] = imageLinks[i];
         }
         this.forTest = forTest;
         this.comments = comments;
@@ -76,11 +78,11 @@ public class PageAdapter extends PagerAdapter {
         final View v = inflater.inflate(R.layout.slider, container, false);
         ListView listViewOfArticle = (ListView)v.findViewById(R.id.listViewOfArticle);
 
-        String picked_item[] = new String[10];//한 분야의 10개 title 추출
+        String picked_item[] = new String[10];//한 분야의 10개 title 추출 + 미리보기 image uri
         final String picked_link[] = new String[10];
 
         for(int i=0;i<10;i++) {
-            picked_item[i] = items[10*position + i];
+            picked_item[i] = items[10*position + i] + "wantyouring" + imageLinks[10*position + i];
             picked_link[i] = links[10*position + i];
         }
 

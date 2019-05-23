@@ -28,4 +28,5 @@ dependencies {
     implementation files('libs/jsoup-1.12.1.jar')
     implementation 'com.android.support:support-v4:28.0.0'
     implementation files('libs/gson-2.8.5.jar')
+    implementation files('libs/picasso-2.5.2.jar')
 }
