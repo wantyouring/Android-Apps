@@ -80,7 +80,7 @@ public class SignUp extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            // 회원가입 성공. database에 회원정보 추가하기
+                            // 회원가입 성공. database에 새 회원정보 추가하기
                             User user = new User(age, gender, name);
                             databaseReference.child("user_id").child(EncodeString(email)).setValue(user); // 지정 id 하위노드 포함 모두 덮어쓰기
                             Toast.makeText(SignUp.this, R.string.success_signup, Toast.LENGTH_SHORT).show();

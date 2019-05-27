@@ -4,6 +4,7 @@ import android.Manifest;
 import android.Manifest.permission;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -15,6 +16,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.telephony.TelephonyManager;
 import android.util.Patterns;
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -41,14 +43,12 @@ public class MainActivity extends AppCompatActivity {
     // 이메일과 비밀번호
     private EditText editTextEmail;
     private EditText editTextPassword;
+    private CheckBox autoLoginCheckBox;
 
     private String email = "";
     private String password = "";
 
-    private DatabaseReference databaseReference =
-            FirebaseDatabase.getInstance().getReference();
-
-
+    SharedPreferences auto;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,27 +61,35 @@ public class MainActivity extends AppCompatActivity {
 
         editTextEmail = findViewById(R.id.et_email);
         editTextPassword = findViewById(R.id.et_password);
+        autoLoginCheckBox = findViewById(R.id.checkBox);
 
-        if (ActivityCompat.checkSelfPermission(this, permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            Toast.makeText(this, "번호 권한이 필요합니다.", Toast.LENGTH_SHORT).show();
-            return;
+        // 자동 로그인
+        auto = getSharedPreferences("auto", MODE_PRIVATE);
+        Boolean autoCheck = auto.getBoolean("autoCheck",false);
+        email = auto.getString("email",null);
+        password = auto.getString("password",null);
+
+        if(autoCheck) {
+            autoLoginCheckBox.setChecked(true);
+            editTextEmail.setText(email);
+            editTextPassword.setText(password);
+            //@@@@@@@@@@@@로그인 후 액티비티로 이동 추가@@@@@@@
+        } else {
+            if (ActivityCompat.checkSelfPermission(this, permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                Toast.makeText(this, "번호 권한이 필요합니다.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            editTextEmail.setText(getPhoneNumber(MainActivity.this)+"@naver.com");
         }
-        editTextEmail.setText(getPhoneNumber(MainActivity.this)+"@naver.com");
-    }
 
-    // 새로운 user 추가
-    private void writeNewUser(String userid, int age, String gender, String name) {
-        User user = new User(age, gender, name);
 
-        databaseReference.child("user_id").child(userid).setValue(user); // 지정 id 하위노드 포함 모두 덮어쓰기
-        //databaseReference.child("user_id").child(userid).push().setValue(user); // 지정 id 하위노드 포함 모두 덮어쓰기
     }
 
     //핸드폰 번호 가져오기
@@ -188,27 +196,8 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    // 회원가입
-    private void createUser(final String email, String password, final int age, final String gender, final String name) {
-        firebaseAuth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            // 회원가입 성공. database에 회원정보 추가하기
-                            User user = new User(age, gender, name);
-                            databaseReference.child("user_id").child(EncodeString(email)).setValue(user); // 지정 id 하위노드 포함 모두 덮어쓰기
-                            Toast.makeText(MainActivity.this, R.string.success_signup, Toast.LENGTH_SHORT).show();
-                        } else {
-                            // 회원가입 실패
-                            Toast.makeText(MainActivity.this, R.string.failed_signup, Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
-    }
-
     // 로그인
-    private void loginUser(String email, String password)
+    private void loginUser(final String email, final String password)
     {
         firebaseAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
@@ -216,7 +205,18 @@ public class MainActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             // 로그인 성공
-                            Toast.makeText(MainActivity.this, R.string.success_login, Toast.LENGTH_SHORT).show();
+                            // 자동로그인 체크면 해당 데이터들 저장.
+                            SharedPreferences.Editor autoLogin = auto.edit();
+                            if(autoLoginCheckBox.isChecked()) {
+                                autoLogin.putBoolean("autoCheck",true);
+                                autoLogin.putString("email",email);
+                                autoLogin.putString("password",password);
+                                Toast.makeText(MainActivity.this, "자동로그인 저장", Toast.LENGTH_SHORT).show();
+                            } else {
+                                autoLogin.putBoolean("autoCheck",false);
+                                Toast.makeText(MainActivity.this, R.string.success_login, Toast.LENGTH_SHORT).show();
+                            }
+                            autoLogin.apply();
                         } else {
                             // 로그인 실패
                             Toast.makeText(MainActivity.this, R.string.failed_login, Toast.LENGTH_SHORT).show();
@@ -225,7 +225,6 @@ public class MainActivity extends AppCompatActivity {
                 });
     }
 
-    //
     public static String EncodeString(String string) {
         return string.replace(".", ",");
     }
