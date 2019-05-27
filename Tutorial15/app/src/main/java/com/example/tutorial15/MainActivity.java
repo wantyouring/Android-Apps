@@ -73,31 +73,15 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(this, "번호 권한이 필요합니다.", Toast.LENGTH_SHORT).show();
             return;
         }
-        editTextEmail.setText(getPhoneNumber(MainActivity.this));
-    }
-
-    //유저 class
-    public class User {
-        public int age;
-        public String gender;
-        public String name;
-
-        public User() {
-
-        }
-
-        public User(int age, String gender, String name) {
-            this.age = age;
-            this.gender = gender;
-            this.name = name;
-        }
+        editTextEmail.setText(getPhoneNumber(MainActivity.this)+"@naver.com");
     }
 
     // 새로운 user 추가
     private void writeNewUser(String userid, int age, String gender, String name) {
         User user = new User(age, gender, name);
+
         databaseReference.child("user_id").child(userid).setValue(user); // 지정 id 하위노드 포함 모두 덮어쓰기
-        //@@@@@@@@@@추가수정
+        //databaseReference.child("user_id").child(userid).push().setValue(user); // 지정 id 하위노드 포함 모두 덮어쓰기
     }
 
     //핸드폰 번호 가져오기
@@ -155,18 +139,15 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if(resultCode != RESULT_OK) {
-            Toast.makeText(this, "오류 발생", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "회원가입 실패", Toast.LENGTH_SHORT).show();
             return;
         }
         if(requestCode == REQUEST_SIGN_UP) {
             String rec_email = data.getStringExtra("email");
             String rec_password = data.getStringExtra("password");
-            String rec_name = data.getStringExtra("name");
-            String rec_age = data.getStringExtra("age");
-            String rec_gender = data.getStringExtra("gender");
-
-            Toast.makeText(this, "테스트\n"+rec_email+rec_password
-                    +rec_name+rec_age+rec_gender, Toast.LENGTH_SHORT).show();
+            editTextEmail.setText(rec_email);
+            editTextPassword.setText(rec_password);
+            //Toast.makeText(this, "회원가입 완료", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -208,16 +189,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // 회원가입
-    private void createUser(String email, String password) {
+    private void createUser(final String email, String password, final int age, final String gender, final String name) {
         firebaseAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             // 회원가입 성공. database에 회원정보 추가하기
-
-
-
+                            User user = new User(age, gender, name);
+                            databaseReference.child("user_id").child(EncodeString(email)).setValue(user); // 지정 id 하위노드 포함 모두 덮어쓰기
                             Toast.makeText(MainActivity.this, R.string.success_signup, Toast.LENGTH_SHORT).show();
                         } else {
                             // 회원가입 실패
@@ -243,5 +223,14 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                 });
+    }
+
+    //
+    public static String EncodeString(String string) {
+        return string.replace(".", ",");
+    }
+
+    public static String DecodeString(String string) {
+        return string.replace(",", ".");
     }
 }
