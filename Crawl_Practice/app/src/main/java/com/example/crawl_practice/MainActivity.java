@@ -3,9 +3,11 @@ package com.example.crawl_practice;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
+import android.support.annotation.Nullable;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -17,6 +19,8 @@ import android.widget.TextView;
 import android.support.v7.widget.Toolbar;
 import android.widget.Toast;
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.tbuonomo.viewpagerdotsindicator.SpringDotsIndicator;
 
 import org.jsoup.Connection;
@@ -31,6 +35,7 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity {
 
     public static Context context;  //adapter dialog에서 context 참조하기 위해서.
+    public static final int REQUEST_LOG_IN = 1;
 
     PageAdapter adapter;
     ViewPager viewPager;
@@ -41,15 +46,17 @@ public class MainActivity extends AppCompatActivity {
     TextView part;
     ImageButton toolbarInfo;
     SpringDotsIndicator springDotsIndicator;
+    private DatabaseReference databaseReference =
+            FirebaseDatabase.getInstance().getReference();
 
     Document doc;
 
     ArrayList<String> items = new ArrayList<String>();
     ArrayList<String> links = new ArrayList<String>();
     String imagelinks[] = new String[60];
-//for data save
-//    SharedPreferences pref = null; //pref에 현재까지 최신 공지 값 저장할 것임.
-//    SharedPreferences.Editor editor = null;// editor에 put 하기
+
+    String user_email;
+    String user_name;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
 
         toolbarInfo.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) { //@@@dialog로 바꾸기
+            public void onClick(View v) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.context);
                 builder.setMessage("기사클릭 : 기사 성향, 댓글 확인\n기사롱클릭 : 해당 기사로 이동\n좌우스크롤 : 분야 이동")
                         .setTitle("사용법")
@@ -89,9 +96,26 @@ public class MainActivity extends AppCompatActivity {
         //생성 동시에 파싱해 뉴스 데이터 가져오기.
         JsoupAsyncTask jsoupAsyncTask = new JsoupAsyncTask();
         jsoupAsyncTask.execute();
-        //for data save
-//        pref = getSharedPreferences("pref", MODE_PRIVATE);
-//        editor = pref.edit();
+
+        Intent intent = new Intent(getApplicationContext(),LogIn.class);
+        startActivityForResult(intent,REQUEST_LOG_IN);
+    }
+
+    //로그인 후 main activity 추가사항
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(resultCode != RESULT_OK) {
+            Toast.makeText(this, "로그인 실패", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
+        if(requestCode == REQUEST_LOG_IN) {
+            //로그인 성공
+            //@@@@@@@@@@@@@@@로그인 한 계정 데이터 가져오기부터 구현@@@@@@@@@@@
+            user_email = data.getStringExtra("email");
+            Toast.makeText(this, user_email + "님 로그인 성공", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private class JsoupAsyncTask extends AsyncTask<Void, Void, Void> {
@@ -135,6 +159,7 @@ public class MainActivity extends AppCompatActivity {
                             .followRedirects(true).execute();
                     doc = response.parse();
 
+                    //썸네일 이미지가 없는 경우도 있어 썸네일 유무도 체크
                     links_ele = doc.select("table.container tbody tr td.content ol.ranking_list img");
                     Elements thumb_check = doc.select("table.container tbody tr td.content ol.ranking_list div.ranking_thumb a");
                     ArrayList<Integer> thumbIndex = new ArrayList<Integer>();
