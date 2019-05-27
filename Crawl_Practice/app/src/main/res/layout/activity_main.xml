@@ -96,7 +96,7 @@
 
         <TextView
             android:id="@+id/part"
-            android:layout_gravity="left"
+            android:layout_gravity="center"
             android:textColor="@android:color/white"
             android:text="분야"
             android:layout_width="wrap_content"

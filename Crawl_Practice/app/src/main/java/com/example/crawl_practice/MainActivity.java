@@ -7,11 +7,13 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.method.ScrollingMovementMethod;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -19,8 +21,11 @@ import android.widget.TextView;
 import android.support.v7.widget.Toolbar;
 import android.widget.Toast;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.tbuonomo.viewpagerdotsindicator.SpringDotsIndicator;
 
 import org.jsoup.Connection;
@@ -56,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
     String imagelinks[] = new String[60];
 
     String user_email;
-    String user_name;
+    String user_data;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,8 +117,24 @@ public class MainActivity extends AppCompatActivity {
         }
         if(requestCode == REQUEST_LOG_IN) {
             //로그인 성공
-            //@@@@@@@@@@@@@@@로그인 한 계정 데이터 가져오기부터 구현@@@@@@@@@@@
             user_email = data.getStringExtra("email");
+            databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                        user_data = snapshot.getValue().toString().split(EncodeString(user_email + "\\=\\{"))[1]; //사용자 데이터 파싱
+                        user_data = user_data.split("\\}")[0]; //ex) gender=남, name=wantyouring , age=10
+                        Log.d("파싱 데이터 : ", "Single ValueEventListener : " + user_data);
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+
+
             Toast.makeText(this, user_email + "님 로그인 성공", Toast.LENGTH_SHORT).show();
         }
     }
@@ -226,5 +247,12 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
         }
+    }
+    public static String EncodeString(String string) {
+        return string.replace(".", ",");
+    }
+
+    public static String DecodeString(String string) {
+        return string.replace(",", ".");
     }
 }
