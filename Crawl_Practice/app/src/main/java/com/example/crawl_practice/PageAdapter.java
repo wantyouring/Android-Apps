@@ -41,6 +41,7 @@ public class PageAdapter extends PagerAdapter {
 
     String link_uri;
     String articleId;
+    public String original_link;
 
     //생성자
     public PageAdapter(Context context, ArrayList<String> items, ArrayList<String> links,
@@ -54,6 +55,11 @@ public class PageAdapter extends PagerAdapter {
         this.forTest = forTest;
         this.comments = comments;
         this.emoticon = emoticon;
+    }
+    //getter
+
+    public String getOriginal_link() {
+        return original_link;
     }
 
     //PageAdapter implements
@@ -121,9 +127,11 @@ public class PageAdapter extends PagerAdapter {
                 //  내용(or 댓글) 가져오기.
                 JsoupAsyncTask jsoupAsyncTask = new JsoupAsyncTask(link_uri,articleId,forTest,comments,emoticon);
                 jsoupAsyncTask.execute();
+                original_link = jsoupAsyncTask.getOriginal_link();
             }
         });
         container.addView(v);
+
         return v;
     }
 
@@ -153,6 +161,10 @@ public class PageAdapter extends PagerAdapter {
             this.emoticon = emoticon;
         }
 
+        public String getOriginal_link() {
+            return original_link;
+        }
+
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -172,6 +184,8 @@ public class PageAdapter extends PagerAdapter {
 
                 //기사 고유번호 파싱. articleId = ne_xxx_xxxxxxxxxx
                 articleId = doc.select("div._reactionModule.u_likeit").first().attr("data-cid");
+                //기사 원본링크 파싱
+                original_link = doc.select("div.article_info div.sponsor").first().attr("href");
 
                 //기사 고유번호로 쿼리보내 기사성향파악.
                 Document doc2 = Jsoup.connect("https://news.like.naver.com/v1/search/contents?q=NEWS["+articleId+"]|NEWS_SUMMARY["+articleId+"]")
@@ -287,6 +301,7 @@ public class PageAdapter extends PagerAdapter {
             forTest.setText(message);
             commentsText.scrollTo(0,0); //scroll맨 위로 올리기
             commentsText.setText(commentsTextString);
+
         }
     }
 }

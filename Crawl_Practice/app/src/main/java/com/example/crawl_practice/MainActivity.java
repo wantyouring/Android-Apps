@@ -9,11 +9,16 @@ import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.NavigationView;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -49,10 +54,12 @@ public class MainActivity extends AppCompatActivity {
     ImageView emoticon;
     Toolbar myToolbar;
     TextView part;
-    ImageButton toolbarInfo;
     SpringDotsIndicator springDotsIndicator;
+    NavigationView navigationView;
+    DrawerLayout drawerLayout;
     private DatabaseReference databaseReference =
             FirebaseDatabase.getInstance().getReference();
+
 
     Document doc;
 
@@ -75,28 +82,15 @@ public class MainActivity extends AppCompatActivity {
         emoticon = (ImageView)findViewById(R.id.emoticon);
         myToolbar = (Toolbar)findViewById(R.id.toolbar);
         part = (TextView)findViewById(R.id.part);
-        toolbarInfo = (ImageButton)findViewById(R.id.toolbarInfo);
         springDotsIndicator = (SpringDotsIndicator)findViewById(R.id.spring_dots_indicator);
+        navigationView = (NavigationView)findViewById(R.id.navigationView) ;
+        drawerLayout = (DrawerLayout)findViewById(R.id.drawerLayout);
 
         forTest.setTypeface(forTest.getTypeface(), Typeface.BOLD);
         setSupportActionBar(myToolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
-
-        toolbarInfo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.context);
-                builder.setMessage("기사클릭 : 기사 성향, 댓글 확인\n기사롱클릭 : 해당 기사로 이동\n좌우스크롤 : 분야 이동")
-                        .setTitle("사용법")
-                        .setPositiveButton("확인", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.cancel();}
-                        });
-                AlertDialog alertDialog = builder.create();
-                alertDialog.show();
-            }
-        });
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_action_view_headline);
 
         //생성 동시에 파싱해 뉴스 데이터 가져오기.
         JsoupAsyncTask jsoupAsyncTask = new JsoupAsyncTask();
@@ -137,6 +131,27 @@ public class MainActivity extends AppCompatActivity {
 
             Toast.makeText(this, user_email + "님 로그인 성공", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    // create action bar button
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.toolbar_menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    // handle button activities
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if(id == android.R.id.home) {
+            drawerLayout.openDrawer(Gravity.LEFT);
+        } else if (id == R.id.clipButton) {
+            // 기사 스크랩하는 코드 추가@@@@@@@@@@@@@@@@
+            // 이 링크 말고 기사 원문 링크 파싱해 가져오기.
+            Toast.makeText(this, adapter.original_link, Toast.LENGTH_SHORT).show();
+        }
+        return true;
     }
 
     private class JsoupAsyncTask extends AsyncTask<Void, Void, Void> {
