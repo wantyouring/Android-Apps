@@ -23,6 +23,7 @@ import android.os.AsyncTask;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -41,7 +42,8 @@ public class PageAdapter extends PagerAdapter {
 
     String link_uri;
     String articleId;
-    public String original_link;
+    String original_link;
+    String title;
 
     //생성자
     public PageAdapter(Context context, ArrayList<String> items, ArrayList<String> links,
@@ -60,6 +62,9 @@ public class PageAdapter extends PagerAdapter {
 
     public String getOriginal_link() {
         return original_link;
+    }
+    public String getTitle() {
+        return title;
     }
 
     //PageAdapter implements
@@ -127,7 +132,6 @@ public class PageAdapter extends PagerAdapter {
                 //  내용(or 댓글) 가져오기.
                 JsoupAsyncTask jsoupAsyncTask = new JsoupAsyncTask(link_uri,articleId,forTest,comments,emoticon);
                 jsoupAsyncTask.execute();
-                original_link = jsoupAsyncTask.getOriginal_link();
             }
         });
         container.addView(v);
@@ -141,7 +145,7 @@ public class PageAdapter extends PagerAdapter {
         container.removeView((View) object);
     }
 
-    //article short click시 기사 성향 가져오기.
+    //article short click시 기사 성향, 기사 원본링크 가져오기.
     private class JsoupAsyncTask extends AsyncTask<Void, Void, Void> {
         String link_uri;
         String articleId;
@@ -159,10 +163,6 @@ public class PageAdapter extends PagerAdapter {
             this.forTest = forTest;
             this.commentsText = commentsText;
             this.emoticon = emoticon;
-        }
-
-        public String getOriginal_link() {
-            return original_link;
         }
 
         @Override
@@ -185,7 +185,15 @@ public class PageAdapter extends PagerAdapter {
                 //기사 고유번호 파싱. articleId = ne_xxx_xxxxxxxxxx
                 articleId = doc.select("div._reactionModule.u_likeit").first().attr("data-cid");
                 //기사 원본링크 파싱
-                original_link = doc.select("div.article_info div.sponsor").first().attr("href");
+                Element parsed = doc.select("div.article_info div.sponsor a").first();
+                if(parsed.text().equals("기사원문")) {
+                    original_link = parsed.attr("href");
+                } else {
+                    original_link = null;
+                }
+                //기사 제목 파싱
+                title = doc.select("head title").first().text();
+                System.out.println("테스트: "+original_link);
 
                 //기사 고유번호로 쿼리보내 기사성향파악.
                 Document doc2 = Jsoup.connect("https://news.like.naver.com/v1/search/contents?q=NEWS["+articleId+"]|NEWS_SUMMARY["+articleId+"]")

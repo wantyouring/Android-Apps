@@ -148,8 +148,12 @@ public class MainActivity extends AppCompatActivity {
             drawerLayout.openDrawer(Gravity.LEFT);
         } else if (id == R.id.clipButton) {
             // 기사 스크랩하는 코드 추가@@@@@@@@@@@@@@@@
-            // 이 링크 말고 기사 원문 링크 파싱해 가져오기.
-            Toast.makeText(this, adapter.original_link, Toast.LENGTH_SHORT).show();
+            // 기사 원문 링크, 제목 파싱해 가져오기. adapter.getTitle()
+            if(adapter.getOriginal_link() == null) {
+                Toast.makeText(this, "기사원문이 없습니다.", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, "스크랩 완료"+adapter.getTitle()+adapter.getOriginal_link(), Toast.LENGTH_SHORT).show();
+            }
         }
         return true;
     }
