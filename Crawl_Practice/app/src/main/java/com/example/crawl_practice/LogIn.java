@@ -121,6 +121,7 @@ public class LogIn extends AppCompatActivity {
         }
     }
 
+    //회원가입 액티비티로 이동
     public void singUp(View view) {
         Intent intent = new Intent(getApplicationContext(),SignUp.class);
         intent.putExtra("email",editTextEmail.getText().toString());
@@ -128,6 +129,7 @@ public class LogIn extends AppCompatActivity {
         startActivityForResult(intent,REQUEST_SIGN_UP);
     }
 
+    //회원가입 완료 이후
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -144,6 +146,7 @@ public class LogIn extends AppCompatActivity {
         }
     }
 
+    //로그인 양식 확인, 로그인 하기
     public void signIn(View view) {
         email = editTextEmail.getText().toString();
         password = editTextPassword.getText().toString();

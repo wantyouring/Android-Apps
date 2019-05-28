@@ -26,6 +26,11 @@ import android.widget.TextView;
 import android.support.v7.widget.Toolbar;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -41,11 +46,15 @@ import org.jsoup.select.Elements;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     public static Context context;  //adapter dialog에서 context 참조하기 위해서.
     public static final int REQUEST_LOG_IN = 1;
+
+    //객체 생성
 
     PageAdapter adapter;
     ViewPager viewPager;
@@ -55,8 +64,14 @@ public class MainActivity extends AppCompatActivity {
     Toolbar myToolbar;
     TextView part;
     SpringDotsIndicator springDotsIndicator;
+    //navigation drawer
     NavigationView navigationView;
     DrawerLayout drawerLayout;
+    TextView nv_name;
+    TextView nv_email;
+
+
+    //firebase
     private DatabaseReference databaseReference =
             FirebaseDatabase.getInstance().getReference();
 
@@ -68,6 +83,7 @@ public class MainActivity extends AppCompatActivity {
     String imagelinks[] = new String[60];
 
     String user_email;
+    String user_name;
     String user_data;
 
     @Override
@@ -76,6 +92,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         context = this;
 
+        //id저장
         forTest = (TextView)findViewById(R.id.forTest);
         comments = (TextView)findViewById(R.id.comments);
         comments.setMovementMethod(new ScrollingMovementMethod());
@@ -86,12 +103,18 @@ public class MainActivity extends AppCompatActivity {
         navigationView = (NavigationView)findViewById(R.id.navigationView) ;
         drawerLayout = (DrawerLayout)findViewById(R.id.drawerLayout);
 
+        //기사성향 textview
         forTest.setTypeface(forTest.getTypeface(), Typeface.BOLD);
+        //actionbar(toolbar)
         setSupportActionBar(myToolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_action_view_headline);
-
+        //navigation bar
+        navigationView.setNavigationItemSelectedListener(this);
+        View nav_header_view = navigationView.getHeaderView(0);
+        nv_name = (TextView)nav_header_view.findViewById(R.id.name);
+        nv_email = (TextView)nav_header_view.findViewById(R.id.email);
         //생성 동시에 파싱해 뉴스 데이터 가져오기.
         JsoupAsyncTask jsoupAsyncTask = new JsoupAsyncTask();
         jsoupAsyncTask.execute();
@@ -112,14 +135,19 @@ public class MainActivity extends AppCompatActivity {
         if(requestCode == REQUEST_LOG_IN) {
             //로그인 성공
             user_email = data.getStringExtra("email");
-            databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            databaseReference.child("user_id").addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                        user_data = snapshot.getValue().toString().split(EncodeString(user_email + "\\=\\{"))[1]; //사용자 데이터 파싱
-                        user_data = user_data.split("\\}")[0]; //ex) gender=남, name=wantyouring , age=10
-                        Log.d("파싱 데이터 : ", "Single ValueEventListener : " + user_data);
+                        if(user_email.equals(DecodeString(snapshot.getKey()))) { //사용자 이메일 데이터 일치하면
+                            user_data = snapshot.getValue().toString(); //사용자 기타 데이터 저장
+                            user_name = user_data.split("name=")[1].split(",")[0];
+                        }
                     }
+                    nv_email.setText(user_email);
+                    nv_name.setText(user_name);
+
+                    Log.d("파싱 : ", "데이터 : " + user_data);
                 }
 
                 @Override
@@ -127,9 +155,7 @@ public class MainActivity extends AppCompatActivity {
 
                 }
             });
-
-
-            Toast.makeText(this, user_email + "님 로그인 성공", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, user_name + "님 로그인 성공", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -152,9 +178,50 @@ public class MainActivity extends AppCompatActivity {
             if(adapter.getOriginal_link() == null) {
                 Toast.makeText(this, "기사원문이 없습니다.", Toast.LENGTH_SHORT).show();
             } else {
+                databaseReference.child("user_id").child(EncodeString(user_email)).child("scrap").push().setValue(adapter.getTitle() + "&&&" + adapter.getOriginal_link());
                 Toast.makeText(this, "스크랩 완료"+adapter.getTitle()+adapter.getOriginal_link(), Toast.LENGTH_SHORT).show();
             }
         }
+        return true;
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+        switch (menuItem.getItemId()) {
+            case R.id.account:
+                Toast.makeText(this, "계정확인", Toast.LENGTH_SHORT).show();
+
+                Toast.makeText(this, user_name, Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.scrap:
+                Toast.makeText(this, "스크랩 기사", Toast.LENGTH_SHORT).show();
+
+                databaseReference.child("user_id").child(EncodeString(user_email)).child("scrap").addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                            String tmp = snapshot.getValue().toString(); //제목, 링크 데이터 모두 가져오기
+                            String scrap_title = tmp.split("&&&")[0];
+                            String scrap_link = tmp.split("&&&")[1];
+                            Log.d("스크랩 테스트",scrap_title + '\n' + scrap_link);
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+
+                break;
+            case R.id.setting:
+
+
+                break;
+            case R.id.logout:
+                break;
+        }
+        drawerLayout.closeDrawer(Gravity.LEFT);
         return true;
     }
 
