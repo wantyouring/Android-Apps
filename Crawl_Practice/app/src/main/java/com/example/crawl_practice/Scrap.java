@@ -32,19 +32,6 @@ import java.util.Collection;
 import java.util.List;
 
 public class Scrap extends AppCompatActivity {
-    private class Scrapped {
-        String part;
-        String time;
-        String title;
-        String link;
-
-        public Scrapped(String part, String time, String title, String link) {
-            this.part = part;
-            this.time = time;
-            this.title = title;
-            this.link = link;
-        }
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,8 +39,8 @@ public class Scrap extends AppCompatActivity {
         setContentView(R.layout.scrap);
 
         TabLayout tabLayout = findViewById(R.id.tab_layout);
-        tabLayout.addTab(tabLayout.newTab().setText("첫번째"));
-        tabLayout.addTab(tabLayout.newTab().setText("두번째"));
+        tabLayout.addTab(tabLayout.newTab().setText("경향분석"));
+        tabLayout.addTab(tabLayout.newTab().setText("기사확인"));
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
 
         Intent getIntent = getIntent();

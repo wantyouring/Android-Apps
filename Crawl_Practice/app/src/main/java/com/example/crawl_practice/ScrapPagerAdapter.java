@@ -1,5 +1,6 @@
 package com.example.crawl_practice;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -28,6 +29,9 @@ public class ScrapPagerAdapter extends FragmentStatePagerAdapter {
                 return tab1;
             case 1:
                 ScrapListFrag tab2 = new ScrapListFrag();
+                Bundle bundle2 = new Bundle(1);
+                bundle2.putStringArrayList("scraps",scraps);
+                tab2.setArguments(bundle2);
                 return tab2;
         }
         return null;

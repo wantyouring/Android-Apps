@@ -21,26 +21,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ScrapChartFrag extends Fragment {
-    private class Scrapped {
-        String part;
-        String time;
-        String title;
-        String link;
 
-        public Scrapped(String part, String time, String title, String link) {
-            this.part = part;
-            this.time = time;
-            this.title = title;
-            this.link = link;
-        }
-    }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.scrap_chart, container, false);
 
         BarChart barChart = view.findViewById(R.id.chart1);
 
-        //Scrap 에서 스크랩 데이터 모두 받기
+        //Scrap에서 ScrapPagerAdapter통해 스크랩 데이터 모두 받기
         ArrayList<String> scraps = getArguments().getStringArrayList("scraps");
         ArrayList<Scrapped> articles = new ArrayList<>();
 
@@ -76,7 +64,7 @@ public class ScrapChartFrag extends Fragment {
         BarDataSet set = new BarDataSet(entries, "분야별 스크랩 수");
 
         //x축 설정
-        final String[] values = { "정치", "경제", "사회", "생활/문화", "세계", "IT/과학"};
+        final String[] values = { "정치", "경제", "사회", "문화", "세계", "IT"};
 
         XAxis xAxis = barChart.getXAxis();
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
