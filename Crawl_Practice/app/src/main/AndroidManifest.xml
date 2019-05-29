@@ -22,6 +22,7 @@
         <activity android:name=".SignUp"></activity>
         <activity android:name=".LogIn"></activity>
         <activity android:name=".Account"></activity>
+        <activity android:name=".Scrap"></activity>
     </application>
 
 </manifest>

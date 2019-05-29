@@ -26,6 +26,11 @@ import android.widget.TextView;
 import android.support.v7.widget.Toolbar;
 import android.widget.Toast;
 
+import com.github.mikephil.charting.charts.Chart;
+import com.github.mikephil.charting.charts.PieChart;
+import com.github.mikephil.charting.data.PieData;
+import com.github.mikephil.charting.data.PieDataSet;
+import com.github.mikephil.charting.data.PieEntry;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -49,6 +54,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
@@ -56,6 +62,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public static Context context;  //PageAdapter dialog에서 context 참조하기 위해서.
     static final int REQUEST_LOG_IN = 1;
     static final int REQUEST_ACCOUNT = 2;
+    static final int REQUEST_SCRAP = 3;
 
     //객체 생성
 
@@ -232,10 +239,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                             String tmp = snapshot.getValue().toString(); //제목, 링크 데이터 모두 가져오기
-                            String scrap_title = tmp.split("&&&")[0];
+                            String scrap_title = tmp.split("&&&")[0]; //title, link 한개씩.(arraylist에 넣자)
                             String scrap_link = tmp.split("&&&")[1];
                             Log.d("스크랩 테스트",scrap_title + '\n' + scrap_link);
                         }
+
+                        Intent intent = new Intent(getApplicationContext(),Scrap.class);
+                        startActivityForResult(intent,REQUEST_SCRAP);
                     }
 
                     @Override
@@ -243,6 +253,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                     }
                 });
+
+
 
                 break;
             case R.id.setting:
