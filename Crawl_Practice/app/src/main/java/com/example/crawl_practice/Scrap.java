@@ -6,49 +6,122 @@ import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.support.v7.app.AppCompatActivity;
 
+import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.PieChart;
+import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.Description;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
+import com.github.mikephil.charting.data.BarData;
+import com.github.mikephil.charting.data.BarDataSet;
+import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
+import com.github.mikephil.charting.formatter.IAxisValueFormatter;
+import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
+import com.github.mikephil.charting.formatter.ValueFormatter;
+import com.github.mikephil.charting.utils.ColorTemplate;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class Scrap extends AppCompatActivity {
+    private class Scrapped {
+        String part;
+        String time;
+        String title;
+        String link;
+
+        public Scrapped(String part, String time, String title, String link) {
+            this.part = part;
+            this.time = time;
+            this.title = title;
+            this.link = link;
+        }
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.scrap);
 
-        PieChart pieChart = findViewById(R.id.chart1);
+        BarChart barChart = findViewById(R.id.chart1);
 
-        List<PieEntry> entries = new ArrayList<>();
-        entries.add(new PieEntry(18.5f, "Green"));
-        entries.add(new PieEntry(26.7f, "Yellow"));
-        entries.add(new PieEntry(24.0f, "Red"));
-        entries.add(new PieEntry(30.8f, "Blue"));
-        PieDataSet set = new PieDataSet(entries, "테스트");
+        //MainActivity 에서 스크랩 데이터 모두 받기
+        Intent getIntent = getIntent();
+        ArrayList<String> scraps = getIntent.getStringArrayListExtra("scraps");
+        ArrayList<Scrapped> articles = new ArrayList<>();
 
-        // 분야별 색깔
-        final int[] MY_COLORS = {Color.rgb(192,0,0), Color.rgb(255,0,0), Color.rgb(255,192,0),
-                Color.rgb(127,127,127)};
-        ArrayList<Integer> colors = new ArrayList<>();
-        for(int c:MY_COLORS)
-            colors.add(c);
-        set.setColors(colors);
+        for(String scrap:scraps) {
+            //[분야, 저장 시각, 제목, 링크] 순으로 파싱해 Scrapped객체로 하나씩 저장
+            String[] parsed = scrap.split("&&&");
+            articles.add(new Scrapped(parsed[0],parsed[1],parsed[2],parsed[3]));
+        }
 
-        PieData data = new PieData(set);
-        data.setValueTextSize(10f);
-        pieChart.setData(data);
+        //분야별로 나온 갯수 세기
+        int[] count = {0,0,0,0,0,0};
+        for(Scrapped part:articles) {
+            if(part.part.equals("정치")){
+                count[0]++;
+            } else if(part.part.equals("경제")){
+                count[1]++;
+            } else if(part.part.equals("사회")){
+                count[2]++;
+            }else if(part.part.equals("생활/문화")){
+                count[3]++;
+            }else if(part.part.equals("세계")){
+                count[4]++;
+            }else if(part.part.equals("IT/과학")){
+                count[5]++;
+            }
+        }
 
-        //label
+
+        //횟수
+        List<BarEntry> entries = new ArrayList<>();
+        for(int i=0;i<6;i++)
+            entries.add(new BarEntry(i,count[i]));
+        BarDataSet set = new BarDataSet(entries, "분야별 스크랩 수");
+
+        //x축 설정
+        final String[] values = { "정치", "경제", "사회", "생활/문화", "세계", "IT/과학"};
+
+        XAxis xAxis = barChart.getXAxis();
+        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+        xAxis.setLabelCount(6);
+        xAxis.setTextSize(13f);
+        xAxis.setDrawGridLines(false);
+        xAxis.setValueFormatter(new IndexAxisValueFormatter(values) {
+            String[] mvalues = new String[6];
+            @Override
+            public String getFormattedValue(float value) {
+                for(int i=0;i<6;i++)
+                    mvalues[i] = values[i];
+                return mvalues[(int)value];
+            }
+        });
+
+        //y축 설정
+        YAxis yAxis_left = barChart.getAxisLeft();
+        yAxis_left.setAxisMinimum(0);
+        yAxis_left.setGranularity(1f);
+
+        YAxis yAxis_right = barChart.getAxisRight();
+        yAxis_right.setEnabled(false);
+
+        //기타 차트 설정
+        BarData data = new BarData(set);
+        set.setColors(ColorTemplate.COLORFUL_COLORS);
+        data.setValueTextSize(13f);
+        barChart.setData(data);
+
         Description description = new Description();
-        description.setText("분야별 스크랩 횟수");
-        description.setTextSize(15);
+        description.setText("");
 
-        pieChart.setDescription(description);
-        pieChart.invalidate(); // refresh
+        barChart.setScaleEnabled(false);
+        barChart.setDescription(description);
+        barChart.invalidate(); // refresh
     }
 
     @Override

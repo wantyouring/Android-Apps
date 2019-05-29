@@ -92,7 +92,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     ArrayList<String> links = new ArrayList<String>();
     String imagelinks[] = new String[60];
 
-    String now_part;
+    String now_part = "정치";
     String user_email;
     String user_name;
     String user_data;
@@ -214,7 +214,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         .setValue(now_part + "&&&" + getTime + "&&&" + adapter.getTitle() +
                                 "&&&" + adapter.getOriginal_link());
 
-                Toast.makeText(this, "스크랩 완료"+adapter.getTitle()+adapter.getOriginal_link(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "스크랩 완료\n"+adapter.getTitle(), Toast.LENGTH_SHORT).show();
             }
         }
         return true;
@@ -237,14 +237,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 databaseReference.child("user_id").child(EncodeString(user_email)).child("scrap").addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        ArrayList<String> scraps = new ArrayList<>();//scrap데이터들 모두 저장
                         for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                            String tmp = snapshot.getValue().toString(); //제목, 링크 데이터 모두 가져오기
-                            String scrap_title = tmp.split("&&&")[0]; //title, link 한개씩.(arraylist에 넣자)
-                            String scrap_link = tmp.split("&&&")[1];
-                            Log.d("스크랩 테스트",scrap_title + '\n' + scrap_link);
+                            scraps.add(snapshot.getValue().toString());
+                            //[분야, 저장 시각, 제목, 링크] 순으로 파싱.
+                            //파싱 => Scrap.java에서 파싱
                         }
 
                         Intent intent = new Intent(getApplicationContext(),Scrap.class);
+                        intent.putStringArrayListExtra("scraps",scraps);
                         startActivityForResult(intent,REQUEST_SCRAP);
                     }
 
