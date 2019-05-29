@@ -45,7 +45,9 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -83,6 +85,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     ArrayList<String> links = new ArrayList<String>();
     String imagelinks[] = new String[60];
 
+    String now_part;
     String user_email;
     String user_name;
     String user_data;
@@ -193,7 +196,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             if(adapter.getOriginal_link() == null) {
                 Toast.makeText(this, "기사원문이 없습니다.", Toast.LENGTH_SHORT).show();
             } else {
-                databaseReference.child("user_id").child(EncodeString(user_email)).child("scrap").push().setValue(adapter.getTitle() + "&&&" + adapter.getOriginal_link());
+                long now = System.currentTimeMillis();
+                Date date = new Date(now);
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                String getTime = sdf.format(date);
+
+                //[분야, 저장 시각, 제목, 링크] 형태로 저장
+                databaseReference.child("user_id").child(EncodeString(user_email)).child("scrap")
+                        .push()
+                        .setValue(now_part + "&&&" + getTime + "&&&" + adapter.getTitle() +
+                                "&&&" + adapter.getOriginal_link());
+
                 Toast.makeText(this, "스크랩 완료"+adapter.getTitle()+adapter.getOriginal_link(), Toast.LENGTH_SHORT).show();
             }
         }
@@ -346,24 +359,25 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     //toolbar 메뉴 setting
                     switch (i) {
                         case 0:
-                            part.setText("정치");
+                            now_part = "정치";
                             break;
                         case 1:
-                            part.setText("경제");
+                            now_part = "경제";
                             break;
                         case 2:
-                            part.setText("사회");
+                            now_part = "사회";
                             break;
                         case 3:
-                            part.setText("생활/문화");
+                            now_part ="생활/문화";
                             break;
                         case 4:
-                            part.setText("세계");
+                            now_part = "세계";
                             break;
                         case 5:
-                            part.setText("IT/과학");
+                            now_part = "IT/과학";
                             break;
                     }
+                    part.setText(now_part);
                 }
 
                 @Override
