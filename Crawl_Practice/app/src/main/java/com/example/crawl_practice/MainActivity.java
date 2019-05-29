@@ -51,8 +51,9 @@ import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
-    public static Context context;  //adapter dialog에서 context 참조하기 위해서.
-    public static final int REQUEST_LOG_IN = 1;
+    public static Context context;  //PageAdapter dialog에서 context 참조하기 위해서.
+    static final int REQUEST_LOG_IN = 1;
+    static final int REQUEST_ACCOUNT = 2;
 
     //객체 생성
 
@@ -123,22 +124,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         startActivityForResult(intent,REQUEST_LOG_IN);
     }
 
-    //로그인 후 main activity 추가사항
+    //다른 Activity에서 넘어와 처리
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(resultCode != RESULT_OK) {
+        if(requestCode == REQUEST_LOG_IN && resultCode != RESULT_OK) {
             Toast.makeText(this, "로그인 실패", Toast.LENGTH_SHORT).show();
             finish();
             return;
         }
-        if(requestCode == REQUEST_LOG_IN) {
+        //Login activity에서 넘어옴
+        if(requestCode == REQUEST_LOG_IN && resultCode == RESULT_OK) {
             //로그인 성공
             user_email = data.getStringExtra("email");
             databaseReference.child("user_id").addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                        Log.d("파싱test",DecodeString(snapshot.getKey()));
                         if(user_email.equals(DecodeString(snapshot.getKey()))) { //사용자 이메일 데이터 일치하면
                             user_data = snapshot.getValue().toString(); //사용자 기타 데이터 저장
                             user_name = user_data.split("name=")[1].split(",")[0];
@@ -146,8 +149,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     }
                     nv_email.setText(user_email);
                     nv_name.setText(user_name);
-
-                    Log.d("파싱 : ", "데이터 : " + user_data);
+                    Toast.makeText(context, user_name + "님 로그인 성공", Toast.LENGTH_SHORT).show();
+                    Log.d("파싱", user_data);
                 }
 
                 @Override
@@ -155,7 +158,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                 }
             });
-            Toast.makeText(this, user_name + "님 로그인 성공", Toast.LENGTH_SHORT).show();
+        }
+
+        //Account activity에서 넘어옴
+        if(requestCode == REQUEST_ACCOUNT && resultCode == RESULT_OK) {
+            user_name = data.getStringExtra("user_name");
+            nv_name.setText(user_name);
+            Toast.makeText(this, user_name + "님 환영합니다~", Toast.LENGTH_SHORT).show();
+//            dialog로 재로그인. 아직 이름만 바꿔 재로그인 필요없음.
+//            Intent intent = new Intent(getApplicationContext(),LogIn.class);
+//            startActivityForResult(intent,REQUEST_LOG_IN);
+        }
+        if(requestCode == REQUEST_ACCOUNT && resultCode != RESULT_OK) {
+            return;
         }
     }
 
@@ -185,13 +200,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return true;
     }
 
+    // navigation drawer items
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+
         switch (menuItem.getItemId()) {
             case R.id.account:
-                Toast.makeText(this, "계정확인", Toast.LENGTH_SHORT).show();
-
-                Toast.makeText(this, user_name, Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(getApplicationContext(),Account.class);
+                intent.putExtra("user_email",user_email);
+                intent.putExtra("user_name",user_name);
+                startActivityForResult(intent,REQUEST_ACCOUNT);
                 break;
             case R.id.scrap:
                 Toast.makeText(this, "스크랩 기사", Toast.LENGTH_SHORT).show();
@@ -219,6 +237,27 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                 break;
             case R.id.logout:
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.context);
+                builder.setMessage("로그아웃 하시겠습니까?")
+                        .setTitle("로그아웃")
+                        .setCancelable(false)
+                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) { //로그아웃
+                                FirebaseAuth.getInstance().signOut(); //firebase 로그아웃
+                                //로그인 intent 생성해 액티비티 변환
+                                Intent intent = new Intent(getApplicationContext(),LogIn.class);
+                                startActivityForResult(intent,REQUEST_LOG_IN);
+                            }
+                        })
+                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) { //로그아웃 취소
+                                dialog.cancel();
+                            }
+                        });
+                AlertDialog alertDialog = builder.create();
+                alertDialog.show();
                 break;
         }
         drawerLayout.closeDrawer(Gravity.LEFT);
@@ -334,6 +373,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             });
         }
     }
+
     public static String EncodeString(String string) {
         return string.replace(".", ",");
     }

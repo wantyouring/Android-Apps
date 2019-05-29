@@ -30,7 +30,7 @@ import java.util.regex.Pattern;
 
 public class LogIn extends AppCompatActivity {
 
-    public static final int REQUEST_SIGN_UP = 100;
+    static final int REQUEST_SIGN_UP = 1;
 
     // 비밀번호 정규식
     private static final Pattern PASSWORD_PATTERN = Pattern.compile("^[a-zA-Z0-9!@.#$%^&*?_~]{6,16}$");
@@ -199,10 +199,10 @@ public class LogIn extends AppCompatActivity {
                                 autoLogin.putBoolean("autoCheck",true);
                                 autoLogin.putString("email",email);
                                 autoLogin.putString("password",password);
-                                Toast.makeText(LogIn.this, "자동로그인 저장", Toast.LENGTH_SHORT).show();
+                                //Toast.makeText(LogIn.this, "자동로그인 저장", Toast.LENGTH_SHORT).show();
                             } else {
                                 autoLogin.putBoolean("autoCheck",false);
-                                Toast.makeText(LogIn.this, R.string.success_login, Toast.LENGTH_SHORT).show();
+                                //Toast.makeText(LogIn.this, R.string.success_login, Toast.LENGTH_SHORT).show();
                             }
                             autoLogin.apply();
                             Intent intent = new Intent();
