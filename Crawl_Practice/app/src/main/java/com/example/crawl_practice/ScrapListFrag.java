@@ -38,7 +38,7 @@ public class ScrapListFrag extends Fragment {
         listViewOfArticle = (ListView)view.findViewById(R.id.listViewOfArticle);
 
         //Scrap에서 ScrapPagerAdapter통해 스크랩 데이터 모두 받기
-        ArrayList<String> scraps = getArguments().getStringArrayList("scraps");
+        scraps = getArguments().getStringArrayList("scraps");
 
         final ArrayList<Scrapped> articles = new ArrayList<>();
         for(String scrap:scraps) {
@@ -46,8 +46,8 @@ public class ScrapListFrag extends Fragment {
             String[] parsed = scrap.split("&&&");
             articles.add(new Scrapped(parsed[0],parsed[1],parsed[2],parsed[3]));
         }
-        String[] picked_item = scraps.toArray(new String[0]);
-        listAdapter = new ScrapListAdapter(getActivity(),picked_item);
+        //String[] picked_item = scraps.toArray(new String[0]);
+        listAdapter = new ScrapListAdapter(getActivity(),scraps);
         //listAdapter = new ScrapListAdapter(getActivity(),new ArrayList<String>(scraps.keySet()));
         listViewOfArticle.setAdapter(listAdapter);
         //롱클릭 시 원본 기사로 이동
@@ -99,6 +99,7 @@ public class ScrapListFrag extends Fragment {
         int count = listAdapter.getCount();
 
         for(int i=count-1; i>=0; i--) {
+            Log.d("인덱스",i+"");
             if(checkedItems.get(i)) {
                 scraps.remove(i);
                 Log.d("삭제",i+"");

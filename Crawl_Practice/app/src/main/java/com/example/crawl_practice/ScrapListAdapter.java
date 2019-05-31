@@ -11,8 +11,10 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
+
 public class ScrapListAdapter extends ArrayAdapter<String> {
-    public ScrapListAdapter(Context context, String[] items) {
+    public ScrapListAdapter(Context context, ArrayList<String> items) {
         super(context, R.layout.list_layout,items);
     }
 
