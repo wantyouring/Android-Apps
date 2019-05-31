@@ -1,41 +1,54 @@
 package com.example.crawl_practice;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
+import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class ScrapListFrag extends Fragment {
+    View view;
+    ListView listViewOfArticle;
+    ArrayList<String> scraps;
+    ScrapListAdapter listAdapter;
+    
+    //Scrap액티비티에서 fragment 접근하기 위해
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        Scrap.fragId = getId();
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.slider, container, false);
-        ListView listViewOfArticle = (ListView)view.findViewById(R.id.listViewOfArticle);
+        view = inflater.inflate(R.layout.slider, container, false);
+        listViewOfArticle = (ListView)view.findViewById(R.id.listViewOfArticle);
 
         //Scrap에서 ScrapPagerAdapter통해 스크랩 데이터 모두 받기
         ArrayList<String> scraps = getArguments().getStringArrayList("scraps");
 
         final ArrayList<Scrapped> articles = new ArrayList<>();
-
         for(String scrap:scraps) {
             //[분야, 날짜, 제목, 링크] 순으로 파싱해 Scrapped객체로 하나씩 저장
             String[] parsed = scrap.split("&&&");
             articles.add(new Scrapped(parsed[0],parsed[1],parsed[2],parsed[3]));
         }
         String[] picked_item = scraps.toArray(new String[0]);
-
-
-
-        ScrapListAdapter listAdapter = new ScrapListAdapter(getActivity(),picked_item);
+        listAdapter = new ScrapListAdapter(getActivity(),picked_item);
+        //listAdapter = new ScrapListAdapter(getActivity(),new ArrayList<String>(scraps.keySet()));
         listViewOfArticle.setAdapter(listAdapter);
         //롱클릭 시 원본 기사로 이동
         listViewOfArticle.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
@@ -51,7 +64,6 @@ public class ScrapListFrag extends Fragment {
                             public void onClick(DialogInterface dialog, int which) { //기사로 이동
                                 //링크 열기
                                 Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(link_uri));
-                                //getActivity().startActivity(i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)); //adapter에서 activity실행하려면 addFlags해줘야함.
                                 getActivity().startActivity(i);
                             }
                         })
@@ -70,11 +82,32 @@ public class ScrapListFrag extends Fragment {
         listViewOfArticle.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                //선택된 상태로 기록, 배경 바꾸기 구현@@@@@@@@@@@
+                Toast.makeText(getActivity(), "기사 선택", Toast.LENGTH_SHORT).show();
             }
         });
         container.addView(view);
 
         return view;
+    }
+
+    public int returnCheckedItemsCount() {
+        return listViewOfArticle.getCheckedItemCount();
+    }
+    
+    public void deleteCheckedItems() {
+        SparseBooleanArray checkedItems = listViewOfArticle.getCheckedItemPositions();
+        int count = listAdapter.getCount();
+
+        for(int i=count-1; i>=0; i--) {
+            if(checkedItems.get(i)) {
+                scraps.remove(i);
+                Log.d("삭제",i+"");
+                //@@@@@@@@@@@firbase 서버에서도 삭제 추가
+
+            }
+        }
+        listViewOfArticle.clearChoices();
+        listAdapter.notifyDataSetChanged();
+
     }
 }
