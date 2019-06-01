@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.util.SparseBooleanArray;
@@ -16,6 +17,17 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -24,6 +36,10 @@ public class ScrapListFrag extends Fragment {
     ListView listViewOfArticle;
     ArrayList<String> scraps;
     ScrapListAdapter listAdapter;
+    ArrayList<Scrapped> articles;
+    FirebaseUser user;
+    String user_email;
+    DatabaseReference databaseReference;
     
     //Scrap액티비티에서 fragment 접근하기 위해
     @Override
@@ -37,10 +53,20 @@ public class ScrapListFrag extends Fragment {
         view = inflater.inflate(R.layout.slider, container, false);
         listViewOfArticle = (ListView)view.findViewById(R.id.listViewOfArticle);
 
+        databaseReference = FirebaseDatabase.getInstance().getReference();
+        //로그인된 사용자 email 가져오기
+        user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null) {
+            user_email = user.getEmail();
+        } else {
+            Toast.makeText(getActivity(), "오류 발생", Toast.LENGTH_SHORT).show();
+            getActivity().finish();
+        }
+
         //Scrap에서 ScrapPagerAdapter통해 스크랩 데이터 모두 받기
         scraps = getArguments().getStringArrayList("scraps");
+        articles = new ArrayList<>();
 
-        final ArrayList<Scrapped> articles = new ArrayList<>();
         for(String scrap:scraps) {
             //[분야, 날짜, 제목, 링크] 순으로 파싱해 Scrapped객체로 하나씩 저장
             String[] parsed = scrap.split("&&&");
@@ -101,14 +127,42 @@ public class ScrapListFrag extends Fragment {
         for(int i=count-1; i>=0; i--) {
             Log.d("인덱스",i+"");
             if(checkedItems.get(i)) {
-                scraps.remove(i);
-                Log.d("삭제",i+"");
-                //@@@@@@@@@@@firbase 서버에서도 삭제 추가
+                //서버에서 삭제
+                final String removeItem = scraps.get(i);
+                databaseReference.child("user_id").child(MainActivity.EncodeString(user_email)).child("scrap").addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        ArrayList<String> scraps = new ArrayList<>();//scrap데이터들 모두 저장
+                        String removeKey;
+                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                            //remove할 값과 똑같으면 key값 찾아 delete
+                            if(snapshot.getValue().toString().equals(removeItem)){
+                                removeKey = snapshot.getKey();
+                                databaseReference.child("user_id").child(MainActivity.EncodeString(user_email)).child("scrap")
+                                        .child(removeKey).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            //삭제완료시 완료 메시지
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
+                                        if(task.isSuccessful()) {
+                                            Toast.makeText(getActivity(), "삭제 완료", Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+                                });
+                                break;
+                            }
+                        }
+                    }
 
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+                //listview에서 삭제
+                scraps.remove(i);
             }
         }
         listViewOfArticle.clearChoices();
         listAdapter.notifyDataSetChanged();
-
     }
 }

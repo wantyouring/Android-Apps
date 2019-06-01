@@ -198,17 +198,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if(id == android.R.id.home) {
             drawerLayout.openDrawer(Gravity.LEFT);
         } else if (id == R.id.clipButton) {
-            // 기사 스크랩하는 코드 추가@@@@@@@@@@@@@@@@
             // 기사 원문 링크, 제목 파싱해 가져오기. adapter.getTitle()
             if(adapter.getOriginal_link() == null) {
                 Toast.makeText(this, "기사원문이 없습니다.", Toast.LENGTH_SHORT).show();
             } else {
+                //분야
+                now_part = getPartFromPage(viewPager.getCurrentItem());
+                //저장 날짜
                 long now = System.currentTimeMillis();
                 Date date = new Date(now);
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
                 String getTime = sdf.format(date);
 
-                //[분야, 저장 시각, 제목, 링크] 형태로 저장
+                //[분야, 저장 날짜, 제목, 링크] 형태로 저장
                 databaseReference.child("user_id").child(EncodeString(user_email)).child("scrap")
                         .push()
                         .setValue(now_part + "&&&" + getTime + "&&&" + adapter.getTitle() +
@@ -232,8 +234,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 startActivityForResult(intent,REQUEST_ACCOUNT);
                 break;
             case R.id.scrap:
-                Toast.makeText(this, "스크랩 기사", Toast.LENGTH_SHORT).show();
-
                 databaseReference.child("user_id").child(EncodeString(user_email)).child("scrap").addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -370,26 +370,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 @Override
                 public void onPageSelected(int i) {
                     //toolbar 메뉴 setting
-                    switch (i) {
-                        case 0:
-                            now_part = "정치";
-                            break;
-                        case 1:
-                            now_part = "경제";
-                            break;
-                        case 2:
-                            now_part = "사회";
-                            break;
-                        case 3:
-                            now_part ="생활/문화";
-                            break;
-                        case 4:
-                            now_part = "세계";
-                            break;
-                        case 5:
-                            now_part = "IT/과학";
-                            break;
-                    }
+                    now_part = MainActivity.getPartFromPage(i);
                     part.setText(now_part);
                 }
 
@@ -399,6 +380,51 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }
             });
         }
+    }
+    public static int getPageFromPart(String part) {
+        int page = 0;
+
+        if(part.equals("정치")){
+            page = 0;
+        } else if(part.equals("경제")) {
+            page = 1;
+        } else if(part.equals("사회")){
+            page = 2;
+        } else if(part.equals("생활/문화")){
+            page = 3;
+        } else if(part.equals("세계")){
+            page = 4;
+        } else if(part.equals("IT/과학")){
+            page = 5;
+        }
+
+        return page;
+    }
+
+    public static String getPartFromPage(int position) {
+        String now_part = null;
+
+        switch (position) {
+            case 0:
+                now_part = "정치";
+                break;
+            case 1:
+                now_part = "경제";
+                break;
+            case 2:
+                now_part = "사회";
+                break;
+            case 3:
+                now_part ="생활/문화";
+                break;
+            case 4:
+                now_part = "세계";
+                break;
+            case 5:
+                now_part = "IT/과학";
+                break;
+        }
+        return now_part;
     }
 
     public static String EncodeString(String string) {

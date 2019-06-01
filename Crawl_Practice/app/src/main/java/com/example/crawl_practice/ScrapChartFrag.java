@@ -3,9 +3,11 @@ package com.example.crawl_practice;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.components.Description;
@@ -22,11 +24,15 @@ import java.util.List;
 
 public class ScrapChartFrag extends Fragment {
 
+    TextView tv_trend;
+    BarChart barChart;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.scrap_chart, container, false);
 
-        BarChart barChart = view.findViewById(R.id.chart1);
+        barChart = view.findViewById(R.id.chart1);
+        tv_trend = view.findViewById(R.id.tv_scrap_trend);
 
         //Scrap에서 ScrapPagerAdapter통해 스크랩 데이터 모두 받기
         ArrayList<String> scraps = getArguments().getStringArrayList("scraps");
@@ -40,22 +46,22 @@ public class ScrapChartFrag extends Fragment {
 
         //분야별로 나온 갯수 세기
         int[] count = {0,0,0,0,0,0};
-        for(Scrapped part:articles) {
-            if(part.part.equals("정치")){
-                count[0]++;
-            } else if(part.part.equals("경제")){
-                count[1]++;
-            } else if(part.part.equals("사회")){
-                count[2]++;
-            }else if(part.part.equals("생활/문화")){
-                count[3]++;
-            }else if(part.part.equals("세계")){
-                count[4]++;
-            }else if(part.part.equals("IT/과학")){
-                count[5]++;
-            }
+        for(Scrapped article:articles) {
+            count[MainActivity.getPageFromPart(article.part)]++;
         }
 
+        //최대 갯수 분야로 스크랩 트렌드 표시
+        int max_part = 0;
+        int max_cnt = 0;
+        for(int i=0;i<count.length;i++) {
+            Log.d("갯수",count[i]+"");
+            if(count[i] > max_cnt) {
+                max_part = i;
+                max_cnt = count[i];
+            }
+        }
+        String trend_text = MainActivity.getPartFromPage(max_part) + " 기사를 많이 스크랩했어요!";
+        tv_trend.setText(trend_text);
 
         //횟수
         List<BarEntry> entries = new ArrayList<>();
