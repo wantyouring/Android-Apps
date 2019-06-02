@@ -82,7 +82,7 @@ public class SignUp extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             // 회원가입 성공. database에 새 회원정보 추가하기
                             User user = new User(age, gender, name);
-                            databaseReference.child("user_id").child(EncodeString(email)).setValue(user);
+                            databaseReference.child("user_id").child(Util.EncodeString(email)).setValue(user);
                             Toast.makeText(SignUp.this, R.string.success_signup, Toast.LENGTH_SHORT).show();
 
                             Intent intent = new Intent();
@@ -97,10 +97,5 @@ public class SignUp extends AppCompatActivity {
                         }
                     }
                 });
-    }
-
-    //database에 .포함되면 안되어 encoding 해줌.
-    public static String EncodeString(String string) {
-        return string.replace(".", ",");
     }
 }

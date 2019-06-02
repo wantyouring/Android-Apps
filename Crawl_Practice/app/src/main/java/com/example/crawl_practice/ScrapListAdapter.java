@@ -27,35 +27,46 @@ public class ScrapListAdapter extends ArrayAdapter<String> {
 
         TextView tv_title = view.findViewById(R.id.title);
         TextView tv_date = view.findViewById(R.id.date);
+        TextView tv_part = view.findViewById(R.id.part);
         ImageView imageView = view.findViewById(R.id.imageView);
 
         //items에서 (분야 0,날짜 1,제목 2,링크 3)구분해 처리
         String[] parsed = item.split("&&&");
+
         //분야 : 해당 분야 이미지 가져오기
-        //구현필요@@
+        int part_num = Util.getPageFromPart(parsed[0]);
+        switch(part_num) {//정치,경제,사회,문화,세계,IT
+            case 0:
+                imageView.setImageResource(R.drawable.politics);
+                tv_part.setText("정치");
+                break;
+            case 1:
+                imageView.setImageResource(R.drawable.economy);
+                tv_part.setText("경제");
+                break;
+            case 2:
+                imageView.setImageResource(R.drawable.society);
+                tv_part.setText("사회");
+                break;
+            case 3:
+                imageView.setImageResource(R.drawable.culture);
+                tv_part.setText("문화");
+                break;
+            case 4:
+                imageView.setImageResource(R.drawable.global);
+                tv_part.setText("세계");
+                break;
+            case 5:
+                imageView.setImageResource(R.drawable.it);
+                tv_part.setText("IT");
+                break;
+        }
+
         //날짜
         tv_date.setText(parsed[1]);
         //제목
         tv_title.setText(parsed[2]);
-        //링크
 
-
-        //-----------구분선-----------
-        /*
-        String imageLink = item.split("wantyouring")[1];
-        item = item.split("wantyouring")[0];
-
-        textView.setText(item); //item의 string으로 textView에 쓰기
-        // 기사 미리보기 이미지 가져오기.
-        if(!imageLink.contains("https"))
-            imageView.setImageResource(R.drawable.cat);
-        else {
-            Picasso.with(MainActivity.context)
-                    .load(imageLink)
-                    .into(imageView);
-        }
-        //imageView.setImageResource(R.mipmap.ic_launcher);
-        */
         return view;
     }
 }

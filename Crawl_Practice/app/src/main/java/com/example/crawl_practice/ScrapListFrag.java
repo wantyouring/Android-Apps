@@ -138,7 +138,7 @@ public class ScrapListFrag extends Fragment {
             if(checkedItems.get(i)) {
                 //서버에서 삭제
                 final String removeItem = scraps.get(i);
-                databaseReference.child("user_id").child(MainActivity.EncodeString(user_email)).child("scrap").addListenerForSingleValueEvent(new ValueEventListener() {
+                databaseReference.child("user_id").child(Util.EncodeString(user_email)).child("scrap").addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         ArrayList<String> scraps = new ArrayList<>();//scrap데이터들 모두 저장
@@ -147,7 +147,7 @@ public class ScrapListFrag extends Fragment {
                             //remove할 값과 똑같으면 key값 찾아 delete
                             if(snapshot.getValue().toString().equals(removeItem)){
                                 removeKey = snapshot.getKey();
-                                databaseReference.child("user_id").child(MainActivity.EncodeString(user_email)).child("scrap")
+                                databaseReference.child("user_id").child(Util.EncodeString(user_email)).child("scrap")
                                         .child(removeKey).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
                                             //삭제완료시 완료 메시지
                                     @Override

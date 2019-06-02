@@ -1,6 +1,7 @@
 package com.example.crawl_practice;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -47,7 +48,7 @@ public class ScrapChartFrag extends Fragment {
         //분야별로 나온 갯수 세기
         int[] count = {0,0,0,0,0,0};
         for(Scrapped article:articles) {
-            count[MainActivity.getPageFromPart(article.part)]++;
+            count[Util.getPageFromPart(article.part)]++;
         }
 
         //최대 갯수 분야로 스크랩 트렌드 표시
@@ -60,7 +61,7 @@ public class ScrapChartFrag extends Fragment {
                 max_cnt = count[i];
             }
         }
-        String trend_text = MainActivity.getPartFromPage(max_part) + " 기사를 많이 스크랩했어요!";
+        String trend_text = Util.getPartFromPage(max_part) + " 기사를 많이 스크랩했어요!";
         tv_trend.setText(trend_text);
 
         //횟수
@@ -97,7 +98,7 @@ public class ScrapChartFrag extends Fragment {
 
         //기타 차트 설정
         BarData data = new BarData(set);
-        set.setColors(ColorTemplate.COLORFUL_COLORS);
+        set.setColors(Color.BLACK);
         data.setValueTextSize(13f);
         barChart.setData(data);
 

@@ -52,6 +52,7 @@ import org.jsoup.select.Elements;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -93,6 +94,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     String imagelinks[] = new String[60];
 
     String now_part = "정치";
+    static String last_selected_part;
     String user_email;
     String user_name;
     String user_data;
@@ -114,6 +116,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         navigationView = (NavigationView)findViewById(R.id.navigationView) ;
         drawerLayout = (DrawerLayout)findViewById(R.id.drawerLayout);
 
+        //분야
+        part.setText(now_part);
         //기사성향 textview
         forTest.setTypeface(forTest.getTypeface(), Typeface.BOLD);
         //actionbar(toolbar)
@@ -151,8 +155,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                        Log.d("파싱test",DecodeString(snapshot.getKey()));
-                        if(user_email.equals(DecodeString(snapshot.getKey()))) { //사용자 이메일 데이터 일치하면
+                        Log.d("파싱test",Util.DecodeString(snapshot.getKey()));
+                        if(user_email.equals(Util.DecodeString(snapshot.getKey()))) { //사용자 이메일 데이터 일치하면
                             user_data = snapshot.getValue().toString(); //사용자 기타 데이터 저장
                             user_name = user_data.split("name=")[1].split(",")[0];
                         }
@@ -202,8 +206,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             if(adapter.getOriginal_link() == null) {
                 Toast.makeText(this, "기사원문이 없습니다.", Toast.LENGTH_SHORT).show();
             } else {
-                //분야
-                now_part = getPartFromPage(viewPager.getCurrentItem());
+                //분야 : last_selected_part
                 //저장 날짜
                 long now = System.currentTimeMillis();
                 Date date = new Date(now);
@@ -211,9 +214,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 String getTime = sdf.format(date);
 
                 //[분야, 저장 날짜, 제목, 링크] 형태로 저장
-                databaseReference.child("user_id").child(EncodeString(user_email)).child("scrap")
+                databaseReference.child("user_id").child(Util.EncodeString(user_email)).child("scrap")
                         .push()
-                        .setValue(now_part + "&&&" + getTime + "&&&" + adapter.getTitle() +
+                        .setValue(last_selected_part + "&&&" + getTime + "&&&" + adapter.getTitle() +
                                 "&&&" + adapter.getOriginal_link());
 
                 Toast.makeText(this, "스크랩 완료\n"+adapter.getTitle(), Toast.LENGTH_SHORT).show();
@@ -234,7 +237,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 startActivityForResult(intent,REQUEST_ACCOUNT);
                 break;
             case R.id.scrap:
-                databaseReference.child("user_id").child(EncodeString(user_email)).child("scrap").addListenerForSingleValueEvent(new ValueEventListener() {
+                databaseReference.child("user_id").child(Util.EncodeString(user_email)).child("scrap").addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         ArrayList<String> scraps = new ArrayList<>();//scrap데이터들 모두 저장
@@ -243,6 +246,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             //[분야, 저장 시각, 제목, 링크] 순으로 파싱.
                             //파싱 => Scrap.java에서 파싱
                         }
+                        Collections.reverse(scraps); //최근 날짜부터 표시
 
                         Intent intent = new Intent(getApplicationContext(),Scrap.class);
                         intent.putStringArrayListExtra("scraps",scraps);
@@ -254,13 +258,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                     }
                 });
-
-
-
                 break;
             case R.id.setting:
-
-
+                Toast.makeText(this, "구현중입니다", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.logout:
                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.context);
@@ -308,7 +308,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         .followRedirects(true).execute();
                 doc = response.parse();
 
-//                Elements titles = doc.select("table.container tbody tr td.content div.content div.ranking_section dt [title]"); //(메인부분)많이 본 뉴스 부분 파싱
                 Elements titles = doc.select("table.container tbody tr td.aside div.aside div.section.section_wide ul.section_list_ranking a[title]"); //(사이드부분)가장 많이 본 뉴스 부분 파싱
                 Elements links_ele = doc.select("table.container tbody tr td.aside div.aside div.section.section_wide ul.section_list_ranking a[href]"); //링크부분 파싱
 
@@ -363,7 +362,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             viewPager.setPageMargin(30);
             */
 
-            adapter = new PageAdapter(getApplicationContext(),items,links,imagelinks,forTest,comments,emoticon);
+            adapter = new PageAdapter(getApplicationContext(),items,links,imagelinks,forTest,comments,emoticon,viewPager);
             viewPager.setAdapter(adapter);
             springDotsIndicator.setViewPager(viewPager);
 
@@ -377,7 +376,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 @Override
                 public void onPageSelected(int i) {
                     //toolbar 메뉴 setting
-                    now_part = MainActivity.getPartFromPage(i);
+                    now_part = Util.getPartFromPage(i);
                     part.setText(now_part);
                 }
 
@@ -387,58 +386,5 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }
             });
         }
-    }
-    public static int getPageFromPart(String part) {
-        int page = 0;
-
-        if(part.equals("정치")){
-            page = 0;
-        } else if(part.equals("경제")) {
-            page = 1;
-        } else if(part.equals("사회")){
-            page = 2;
-        } else if(part.equals("생활/문화")){
-            page = 3;
-        } else if(part.equals("세계")){
-            page = 4;
-        } else if(part.equals("IT/과학")){
-            page = 5;
-        }
-
-        return page;
-    }
-
-    public static String getPartFromPage(int position) {
-        String now_part = null;
-
-        switch (position) {
-            case 0:
-                now_part = "정치";
-                break;
-            case 1:
-                now_part = "경제";
-                break;
-            case 2:
-                now_part = "사회";
-                break;
-            case 3:
-                now_part ="생활/문화";
-                break;
-            case 4:
-                now_part = "세계";
-                break;
-            case 5:
-                now_part = "IT/과학";
-                break;
-        }
-        return now_part;
-    }
-
-    public static String EncodeString(String string) {
-        return string.replace(".", ",");
-    }
-
-    public static String DecodeString(String string) {
-        return string.replace(",", ".");
     }
 }

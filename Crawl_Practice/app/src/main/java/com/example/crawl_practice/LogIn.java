@@ -216,12 +216,4 @@ public class LogIn extends AppCompatActivity {
                     }
                 });
     }
-
-    public static String EncodeString(String string) {
-        return string.replace(".", ",");
-    }
-
-    public static String DecodeString(String string) {
-        return string.replace(",", ".");
-    }
 }

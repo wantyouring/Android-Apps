@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,6 +40,7 @@ public class PageAdapter extends PagerAdapter {
     TextView forTest;
     TextView comments;
     ImageView emoticon;
+    ViewPager viewPager;
 
     String link_uri;
     String articleId;
@@ -47,7 +49,7 @@ public class PageAdapter extends PagerAdapter {
 
     //생성자
     public PageAdapter(Context context, ArrayList<String> items, ArrayList<String> links,
-                       String imageLinks[],TextView forTest, TextView comments, ImageView emoticon) {
+                       String imageLinks[],TextView forTest, TextView comments, ImageView emoticon, ViewPager viewPager) {
         this.context = context;
         for(int i=0;i<60;i++) {
             this.items[i] = items.get(i);
@@ -57,6 +59,7 @@ public class PageAdapter extends PagerAdapter {
         this.forTest = forTest;
         this.comments = comments;
         this.emoticon = emoticon;
+        this.viewPager = viewPager;
     }
     //getter
 
@@ -129,6 +132,7 @@ public class PageAdapter extends PagerAdapter {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 link_uri = picked_link[position]; //링크uri 저장.
+                MainActivity.last_selected_part = Util.getPartFromPage(viewPager.getCurrentItem());
                 //  내용(or 댓글) 가져오기.
                 JsoupAsyncTask jsoupAsyncTask = new JsoupAsyncTask(link_uri,articleId,forTest,comments,emoticon);
                 jsoupAsyncTask.execute();

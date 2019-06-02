@@ -17,8 +17,6 @@ public class Account extends AppCompatActivity {
 
     TextView tv_email;
     TextView tv_user_email;
-    TextView tv_password;
-    EditText et_password;
     TextView tv_name;
     EditText et_name;
 
@@ -31,10 +29,8 @@ public class Account extends AppCompatActivity {
         setContentView(R.layout.account);
 
         tv_email = findViewById(R.id.tv_email);
-        tv_password = findViewById(R.id.tv_password);
         tv_name = findViewById(R.id.tv_name);
         tv_user_email = findViewById(R.id.tv_user_email);
-        et_password = findViewById(R.id.et_password);
         et_name = findViewById(R.id.et_name);
 
         Intent getIntent = getIntent();
@@ -57,7 +53,7 @@ public class Account extends AppCompatActivity {
         //이름 변경(server)
         DatabaseReference databaseReference =
                 FirebaseDatabase.getInstance().getReference();
-        databaseReference.child("user_id").child(MainActivity.EncodeString(user_email)).child("name").setValue(user_name);
+        databaseReference.child("user_id").child(Util.EncodeString(user_email)).child("name").setValue(user_name);
         //변경 이름 main activity로 전송
         Intent intent = new Intent();
         intent.putExtra("user_name",user_name);
