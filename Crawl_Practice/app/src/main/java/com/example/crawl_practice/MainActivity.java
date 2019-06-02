@@ -357,6 +357,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         protected void onPostExecute(Void result) {
             viewPager = (ViewPager)findViewById(R.id.viewPager);
             viewPager.setOffscreenPageLimit(6); //처음에 6페이지 모두 로드
+            /* //viewpager 좌우 살짝 보이게 하는 옵션
+            viewPager.setClipToPadding(false);
+            viewPager.setPadding(60,0,60,0);
+            viewPager.setPageMargin(30);
+            */
+
             adapter = new PageAdapter(getApplicationContext(),items,links,imagelinks,forTest,comments,emoticon);
             viewPager.setAdapter(adapter);
             springDotsIndicator.setViewPager(viewPager);

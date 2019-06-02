@@ -116,10 +116,19 @@ public class ScrapListFrag extends Fragment {
         return view;
     }
 
+    //check된 item 수
     public int returnCheckedItemsCount() {
         return listViewOfArticle.getCheckedItemCount();
     }
-    
+
+    //모든 item check 또는 check해제
+    public void selectAllItems(boolean toggle) {
+        for(int i=0;i<listViewOfArticle.getAdapter().getCount();i++) {
+            listViewOfArticle.setItemChecked(i,toggle);
+        }
+    }
+
+    //checked items 삭제
     public void deleteCheckedItems() {
         SparseBooleanArray checkedItems = listViewOfArticle.getCheckedItemPositions();
         int count = listAdapter.getCount();

@@ -16,13 +16,19 @@ import java.util.ArrayList;
 public class Scrap extends AppCompatActivity {
 
     public static int fragId;
+    static boolean toggle = false;
+
+    Toolbar myToolbar;
+    TabLayout tabLayout;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.scrap);
 
-        TabLayout tabLayout = findViewById(R.id.tab_layout);
-        Toolbar myToolbar = findViewById(R.id.toolbar);
+        tabLayout = findViewById(R.id.tab_layout);
+        myToolbar = findViewById(R.id.toolbar);
+
         tabLayout.addTab(tabLayout.newTab().setText("경향분석"));
         tabLayout.addTab(tabLayout.newTab().setText("기사확인"));
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
@@ -30,7 +36,7 @@ public class Scrap extends AppCompatActivity {
         //action bar setting
         setSupportActionBar(myToolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
-
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_action_check_circle_outline);
 
         //scrap데이터 가져오기
         Intent getIntent = getIntent();
@@ -41,6 +47,7 @@ public class Scrap extends AppCompatActivity {
         final ScrapPagerAdapter adapter = new ScrapPagerAdapter
                 (getSupportFragmentManager(), tabLayout.getTabCount(), scraps);
         viewPager.setAdapter(adapter);
+        //tab과 viewpager page 연동
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
@@ -58,6 +65,31 @@ public class Scrap extends AppCompatActivity {
 
             }
         });
+        // viewpager page에 따라서 toolbar 버튼 변경(삭제 버튼은 아직 구현x)
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int i, float v, int i1) {
+
+            }
+
+            @Override
+            public void onPageSelected(int i) {
+                if(i == 0) {
+                    getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+                    //myToolbar.getMenu().findItem(R.id.deleteButton).setVisible(false);
+                    invalidateOptionsMenu();
+                } else if(i == 1) {
+                    getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+                    //myToolbar.getMenu().findItem(R.id.deleteButton).setVisible(true);
+                    invalidateOptionsMenu();
+                }
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int i) {
+
+            }
+        });
     }
     //action bar 설정
     @Override
@@ -70,9 +102,8 @@ public class Scrap extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
+        final ScrapListFrag scrapListFrag = (ScrapListFrag) getSupportFragmentManager().findFragmentById(fragId);
         if (id == R.id.deleteButton) { //삭제 버튼
-            final ScrapListFrag scrapListFrag = (ScrapListFrag) getSupportFragmentManager().findFragmentById(fragId);
-
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setMessage(scrapListFrag.returnCheckedItemsCount()+"개 기사를 삭제하시겠습니까?")
                     .setTitle("스크랩 삭제")
@@ -92,6 +123,9 @@ public class Scrap extends AppCompatActivity {
                     });
             AlertDialog alertDialog = builder.create();
             alertDialog.show();
+        } else if(id == android.R.id.home) { //선택 버튼
+            toggle = !toggle;
+            scrapListFrag.selectAllItems(toggle);
         }
         return true;
     }

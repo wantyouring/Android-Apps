@@ -38,7 +38,6 @@ public class listAdapter extends ArrayAdapter<String> {
                     .load(imageLink)
                     .into(imageView);
         }
-        //imageView.setImageResource(R.mipmap.ic_launcher);
         return view;
     }
 }

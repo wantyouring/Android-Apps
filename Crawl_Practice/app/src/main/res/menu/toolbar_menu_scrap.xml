@@ -5,6 +5,6 @@
         android:id="@+id/deleteButton"
         android:title=""
         app:showAsAction="always"
-        android:icon="@drawable/ic_action_check_circle_outline"
+        android:icon="@drawable/ic_action_delete"
         />
 </menu>

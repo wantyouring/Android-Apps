@@ -3,11 +3,11 @@ package com.example.crawl_practice;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.app.FragmentPagerAdapter;
 
 import java.util.ArrayList;
 
-public class ScrapPagerAdapter extends FragmentStatePagerAdapter {
+public class ScrapPagerAdapter extends FragmentPagerAdapter {
     int mNumOfTabs;
     ArrayList<String> scraps;
 
