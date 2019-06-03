@@ -23,6 +23,9 @@
         <activity android:name=".LogIn"></activity>
         <activity android:name=".Account"></activity>
         <activity android:name=".Scrap"></activity>
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="078e0fa4ff538d8b4e9e7a9cf27ee38e6962e359" />
     </application>
 
 </manifest>
