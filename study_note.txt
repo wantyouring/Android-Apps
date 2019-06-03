@@ -190,15 +190,18 @@ firebase강좌. howlab의 채팅앱 만들기 강좌 공부하기. firebase 공식 document로 공�
 (완료)로그인 데이터 기반으로 할 수 있는 것. => navigation bar로 구현하기
 (완료)ㄴ스크랩 기사 보기(스크랩 firebase 회원정보에 저장 구현하기)
 (완료)기사스크랩 기능 추가.
-기사 클릭 시 해당 기사 배경 바뀌게=> 잘 안됨. 더 고민해보기.
+(완료)기사 클릭 시 해당 기사 배경 바뀌게=> 잘 안됨. 더 고민해보기.
 (완료)기사 스크랩 한 시간, 분야 추가저장.
 (완료)기사원문 없을 시 예외처리하기. => 일단 스크랩 안되게 처리.
 (완료)fragment 써보기 => viewpager fragment사용
 스크랩 경향분석에 더 추가할 것 생각.
-스크랩 기사 activity toolbar에 좌:뒤로가기 버튼, 우:휴지통 버튼 추가하기.
-분야 이미지(정치,경제,사회,문화,세계,IT) 추가하기.
+(완료)스크랩 기사 activity toolbar에 좌:뒤로가기 버튼, 우:휴지통 버튼 추가하기.
+(완료)분야 이미지(정치,경제,사회,문화,세계,IT) 추가하기.
 @@@@@스크랩 삭제시 서버에서도 삭제되게끔 구현하기부터~~
 firebase 스크랩 데이터 hashmap으로 관리하기.
+
+
+
 
 
 navigation drawer activity들 만들기.
@@ -209,24 +212,3 @@ navigation drawer activity들 만들기.
 
 뉴스에 대한 토론방. 채팅방 기능.
 앱 버전체크
-##############################################
-
-//FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
-                //currentUser.getDisplayName() 파이어베이스 authentication 계정정보에 저장하는 방법.
-                //허나 realtime database에 저장할 것임. (authentication에 저장하면 이름, 사진 데이터밖에 저장 안됨)
-
-
-//임시 테스트 코드. 사용자 프로필 업데이트. 완료 리스너
-
-                FirebaseUser currentUser2 = FirebaseAuth.getInstance().getCurrentUser();
-                UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
-                        .setDisplayName("wantyouringring")
-                        .build();
-                currentUser2.updateProfile(profileUpdates).addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if(task.isSuccessful()) {
-                            Toast.makeText(MainActivity.this, "이름 설정 완료", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
