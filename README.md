@@ -21,6 +21,4 @@
 ## apps
 - Crawl_practice : naver기사, 댓글, 성향 크롤링
 
-![Crawl_practice 1](https://raw.githubusercontent.com/wantyouring/Android-Apps/master/Crawl_Practice/app/release/appImage3.jpg)
-![Crawl_practice 2](https://raw.githubusercontent.com/wantyouring/Android-Apps/master/Crawl_Practice/app/release/appImage1.jpg)
-![Crawl_practice 3](https://raw.githubusercontent.com/wantyouring/Android-Apps/master/Crawl_Practice/app/release/appImage2.jpg)
+[![Alt text](https://img.youtube.com/vi/w59GkSXXPqI/0.jpg)](https://www.youtube.com/watch?v=w59GkSXXPqI)
