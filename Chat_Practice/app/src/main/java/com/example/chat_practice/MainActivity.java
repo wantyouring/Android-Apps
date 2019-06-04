@@ -14,6 +14,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
@@ -36,10 +37,8 @@ public class MainActivity extends AppCompatActivity {
 
         final String userName = "user" + new Random().nextInt(10000);  // 랜덤한 유저 이름 설정 ex) user1234
 
-        // 기본 Text를 담을 수 있는 simple_list_item_1을 사용해서 ArrayAdapter를 만들고 listview에 설정
-        final ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, android.R.id.text1);
-        listView.setAdapter(adapter);
-
+        final ListAdapter listAdapter = new ListAdapter(this,new ArrayList<ChatData>());
+        listView.setAdapter(listAdapter);
 
         sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -54,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 ChatData chatData = dataSnapshot.getValue(ChatData.class);  // chatData를 가져오고
-                adapter.add(chatData.getUserName() + ": " + chatData.getMessage());  // adapter에 추가합니다.
+                listAdapter.add(chatData);  // adapter에 추가합니다.
             }
 
             @Override
