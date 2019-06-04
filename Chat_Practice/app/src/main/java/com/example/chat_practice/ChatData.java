@@ -1,14 +1,19 @@
 package com.example.chat_practice;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 public class ChatData {
     private String userName;
     private String message;
+    private String time;
 
     public ChatData() { }
 
-    public ChatData(String userName, String message) {
+    public ChatData(String userName, String message, long time) {
         this.userName = userName;
         this.message = message;
+        this.time = new SimpleDateFormat("HH:mm").format(new Date(time));
     }
 
     public String getUserName() {
@@ -25,5 +30,9 @@ public class ChatData {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public String getTime() {
+        return time;
     }
 }

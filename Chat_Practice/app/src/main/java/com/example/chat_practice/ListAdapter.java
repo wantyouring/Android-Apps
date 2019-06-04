@@ -13,6 +13,7 @@ public class ListAdapter extends ArrayAdapter<ChatData> {
 
     TextView tv_name;
     TextView tv_message;
+    TextView tv_time;
 
     public ListAdapter(Context context, ArrayList<ChatData> datas) {
         super(context, R.layout.list_view,datas);
@@ -26,9 +27,11 @@ public class ListAdapter extends ArrayAdapter<ChatData> {
 
         tv_name = view.findViewById(R.id.name);
         tv_message = view.findViewById(R.id.message);
+        tv_time = view.findViewById(R.id.time);
 
         tv_name.setText(data.getUserName());
         tv_message.setText(data.getMessage());
+        tv_time.setText(data.getTime());
 
         return view;
     }

@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
         sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ChatData chatData = new ChatData(userName, editText.getText().toString());  // 유저 이름과 메세지로 chatData 만들기
+                ChatData chatData = new ChatData(userName, editText.getText().toString(),System.currentTimeMillis());  // 유저 이름과 메세지로 chatData 만들기
                 databaseReference.child("message").push().setValue(chatData);  // 기본 database 하위 message라는 child에 chatData를 list로 만들기
                 editText.setText("");
             }
