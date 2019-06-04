@@ -214,7 +214,5 @@ navigation drawer activity들 만들기.
 앱 버전체크
 
 ---------------
-새로운 앱 구상.
-채팅앱 제작해보기
 
-firebase기반 기본 채팅 어플.
+
